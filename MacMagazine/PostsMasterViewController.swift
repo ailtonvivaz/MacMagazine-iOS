@@ -52,6 +52,7 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	var lastContentOffset = CGPoint()
 	var direction: Direction = .up
 	var lastPage = -1
+	var openRecentPost = false
 
 	var selectedIndexPath: IndexPath?
 	var links: [PostData] = []
@@ -70,7 +71,8 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		super.viewDidLoad()
 
 		// Do any additional setup after loading the view, typically from a nib.
-		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutAction(_:)), name: .shortcutAction, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionLastPost(_:)), name: .shortcutActionLastPost, object: nil)
+		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionRecentPost(_:)), name: .shortcutActionRecentPost, object: nil)
 
 		self.navigationItem.titleView = logoView
 		self.navigationItem.title = nil
@@ -140,15 +142,26 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	// MARK: - Segues -
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		if tableView.indexPathForSelectedRow != nil {
-			guard let navController = segue.destination as? UINavigationController,
-				let controller = navController.topViewController as? PostsDetailViewController,
-				let indexPath = selectedIndexPath,
-				let post = fetchController?.object(at: indexPath)
-				else {
+		guard let navController = segue.destination as? UINavigationController,
+			let controller = navController.topViewController as? PostsDetailViewController,
+			let indexPath = selectedIndexPath
+			else {
+				return
+		}
+
+		guard let _ = navigationItem.searchController else {
+			// Normal Posts table
+			if tableView.indexPathForSelectedRow != nil {
+				guard let post = fetchController?.object(at: indexPath) else {
 					return
+				}
+				prepareDetailController(controller, using: links, compare: post.link)
 			}
-			prepareDetailController(controller, using: links, compare: post.link)
+			return
+		}
+		// Search Posts table
+		if resultsTableController?.tableView.indexPathForSelectedRow != nil {
+			prepareDetailController(controller, using: links, compare: posts[indexPath.row].link)
 		}
 	}
 
@@ -272,12 +285,26 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 						self.fetchController?.reloadData()
 
 						if paged < 1 {
-							DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-								self.refreshControl?.endRefreshing()
+							if self.openRecentPost {
+								// Came from 3D touch, openRecentPost
+								let indexPath = IndexPath(row: 0, section: 0)
+								self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .bottom)
+
+								if Settings().isPad() {
+									self.fetchController?.tableView(self.tableView, didSelectRowAt: indexPath)
+								} else {
+									self.didSelectRowAt(indexPath: indexPath)
+								}
+
+							} else {
 								DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-									self.processSelection()
+									self.refreshControl?.endRefreshing()
+									DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+										self.processSelection()
+									}
 								}
 							}
+							self.openRecentPost = false
 						}
 						return
 					}
@@ -393,6 +420,7 @@ extension PostsMasterViewController: UISearchBarDelegate {
 	}
 
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+		posts = []
 		searchBar.resignFirstResponder()
 		navigationItem.searchController = nil
 	}
@@ -456,12 +484,18 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 // MARK: - Peek&Pop -
 
 extension PostsMasterViewController {
-	@objc func onShortcutAction(_ notification: Notification) {
+	@objc func onShortcutActionLastPost(_ notification: Notification) {
+		openRecentPost = false
+
 		if Settings().isPad() {
 			processTabletSelection()
 		} else {
 			processPhoneSelection()
 		}
+	}
+
+	@objc func onShortcutActionRecentPost(_ notification: Notification) {
+		openRecentPost = true
 	}
 }
 

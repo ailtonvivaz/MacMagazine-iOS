@@ -21,6 +21,8 @@ class SettingsTableViewController: UITableViewController {
 	@IBOutlet private weak var iconOption1: UIImageView!
 	@IBOutlet private weak var iconOption2: UIImageView!
 
+	@IBOutlet private weak var pushOptions: AppSegmentedControl!
+
     var version: String = ""
 
     // MARK: - View lifecycle -
@@ -36,6 +38,8 @@ class SettingsTableViewController: UITableViewController {
 		let iconName = UserDefaults.standard.string(forKey: Definitions.icon)
 		self.iconOption1.alpha = iconName ?? IconOptions.option1 == IconOptions.option1 ? 1 : 0.6
 		self.iconOption2.alpha = iconName ?? IconOptions.option1 == IconOptions.option2 ? 1 : 0.6
+
+		pushOptions.selectedSegmentIndex = Settings().getPushPreference()
 
 		guard MFMailComposeViewController.canSendMail() else {
 			reportProblem.isHidden = true
@@ -64,6 +68,15 @@ class SettingsTableViewController: UITableViewController {
 
 		// Delete all downloaded images
 		ImageCache.default.clearDiskCache()
+
+		let alertController = UIAlertController(title: "Cache limpo!", message: "Todo o conteúdo do app será agora recarregado.", preferredStyle: .alert)
+		alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+			self.dismiss(animated: true)
+		})
+		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool {
+			alertController.view.tintColor = isDarkMode ? .black : UIColor(hex: "0097d4", alpha: 1)
+		}
+		self.present(alertController, animated: true)
 	}
 
     @IBAction private func changeFontSize(_ sender: Any) {
@@ -73,7 +86,8 @@ class SettingsTableViewController: UITableViewController {
 
         var fontSize = ""
         var roundedValue = 1
-        if slider.value < 0.65 {
+
+		if slider.value < 0.65 {
             roundedValue = 0
             fontSize = "fontemenor"
         }
@@ -86,7 +100,7 @@ class SettingsTableViewController: UITableViewController {
         UserDefaults.standard.set(fontSize, forKey: Definitions.fontSize)
         UserDefaults.standard.synchronize()
 
-        applyTheme()
+		applyTheme()
     }
 
     @IBAction private func changeDarkMode(_ sender: Any) {
@@ -101,7 +115,7 @@ class SettingsTableViewController: UITableViewController {
 	}
 
 	@IBAction private func setPushMode(_ sender: Any) {
-		guard let segment = sender as? UISegmentedControl else {
+		guard let segment = sender as? AppSegmentedControl else {
 			return
 		}
 		Settings().updatePushPreferences(segment.selectedSegmentIndex)
@@ -112,10 +126,10 @@ class SettingsTableViewController: UITableViewController {
     fileprivate func applyTheme() {
         let isDarkMode = Settings().isDarkMode()
 
-        let theme: Theme = isDarkMode ? DarkTheme() : LightTheme()
+		let theme: Theme = isDarkMode ? DarkTheme() : LightTheme()
         theme.apply(for: UIApplication.shared)
 
-        darkMode.isOn = isDarkMode
+		darkMode.isOn = isDarkMode
 		NotificationCenter.default.post(name: .reloadWeb, object: nil)
     }
 
@@ -162,8 +176,19 @@ extension SettingsTableViewController {
 			let icon = IconOptions().getIcon(for: iconName) else {
 				return
 		}
+
+		// Temporary change the colors
+		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool {
+			UIApplication.shared.keyWindow?.tintColor = isDarkMode ? .black : UIColor(hex: "0097d4", alpha: 1)
+		}
+
 		UIApplication.shared.setAlternateIconName(icon) { error in
 			if error == nil {
+				// Return to theme settings
+				DispatchQueue.main.async {
+					self.applyTheme()
+				}
+
 				UserDefaults.standard.set(iconName, forKey: Definitions.icon)
 				UserDefaults.standard.synchronize()
 

@@ -9,11 +9,12 @@
 import UIKit
 import WebKit
 
-class AppImageView: UIImageView {}
-class FavoriteImageView: UIImageView {}
 class AppButton: UIButton {}
+class AppSegmentedControl: UISegmentedControl {}
 
 protocol Theme {
+	var hightlightLogo: Bool { get }
+
 	var videoLabelColor: UIColor { get }
 
 	var barStyle: UIBarStyle { get }
@@ -196,6 +197,7 @@ extension Theme {
 			$0.borderColor = UIColor(hex: "dddddd", alpha: 1)
 		}
 		FavoriteImageView.appearance().tintColor = tint
+		NavLogoImageView.appearance().hightlightLogo = hightlightLogo
 
 		// SWITCH
 
@@ -204,6 +206,14 @@ extension Theme {
         // SLIDER
 
         UISlider.appearance().tintColor = tint
+
+		// SEGMENTCONTROL
+
+		AppSegmentedControl.appearance().tintColor = tint
+		UILabel.appearance(whenContainedInInstancesOf: [AppSegmentedControl.self]).with {
+			$0.textColor = tint
+			$0.fontSize = CGFloat(0.785)
+		}
 
 		// WEBVIEW
 

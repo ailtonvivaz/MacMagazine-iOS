@@ -85,6 +85,7 @@
 		9BD135FE2228089900A0B627 /* UISplitViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD135FD2228089900A0B627 /* UISplitViewControllerExtension.swift */; };
 		9BD13600222822A600A0B627 /* UITextFieldTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD135FF222822A600A0B627 /* UITextFieldTheme.swift */; };
 		9BD1360F22283DF300A0B627 /* UILabelTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD1360E22283DF300A0B627 /* UILabelTheme.swift */; };
+		9BD4CBAE228C6B8B00836955 /* UIImageViewTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BD4CBAD228C6B8B00836955 /* UIImageViewTheme.swift */; };
 		9BD4E97A225CFDEC00683B88 /* phone_2@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BD4E972225CFDEC00683B88 /* phone_2@3x.png */; };
 		9BD4E97B225CFDEC00683B88 /* tablet_1@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BD4E973225CFDEC00683B88 /* tablet_1@2x.png */; };
 		9BD4E97C225CFDEC00683B88 /* tablet_2.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BD4E974225CFDEC00683B88 /* tablet_2.png */; };
@@ -256,6 +257,7 @@
 		9BD135FD2228089900A0B627 /* UISplitViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISplitViewControllerExtension.swift; sourceTree = "<group>"; };
 		9BD135FF222822A600A0B627 /* UITextFieldTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextFieldTheme.swift; sourceTree = "<group>"; };
 		9BD1360E22283DF300A0B627 /* UILabelTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabelTheme.swift; sourceTree = "<group>"; };
+		9BD4CBAD228C6B8B00836955 /* UIImageViewTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageViewTheme.swift; sourceTree = "<group>"; };
 		9BD4E972225CFDEC00683B88 /* phone_2@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "phone_2@3x.png"; sourceTree = "<group>"; };
 		9BD4E973225CFDEC00683B88 /* tablet_1@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tablet_1@2x.png"; sourceTree = "<group>"; };
 		9BD4E974225CFDEC00683B88 /* tablet_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tablet_2.png; sourceTree = "<group>"; };
@@ -526,6 +528,7 @@
 		9BD135E3222804BF00A0B627 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				9BD4CBAD228C6B8B00836955 /* UIImageViewTheme.swift */,
 				9BD1360E22283DF300A0B627 /* UILabelTheme.swift */,
 				9BD135FD2228089900A0B627 /* UISplitViewControllerExtension.swift */,
 				9BD135E5222804E500A0B627 /* UITableViewCellTheme.swift */,
@@ -731,8 +734,8 @@
 			buildRules = (
 			);
 			dependencies = (
-				9BB4BC68225B99F700559170 /* PBXTargetDependency */,
 				9B9C7F9F226BF836000534CA /* PBXTargetDependency */,
+				9BB4BC68225B99F700559170 /* PBXTargetDependency */,
 			);
 			name = MacMagazine;
 			productName = MacMagazine;
@@ -910,7 +913,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n";
+			shellScript = "#!/bin/bash\nif [ $CONFIGURATION == Release ]; then\n\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"${SRCROOT}/MacMagazineNotificationServiceExtension/Info.plist\"\n\nfi\n";
 		};
 		9B5D4043225EA38F00315963 /* Run Sign Framework Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1008,7 +1011,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n";
+			shellScript = "#!/bin/bash\n\nif [ $CONFIGURATION == Release ]; then\n\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n\nfi\n";
 		};
 		9BB4BC75225B9B8000559170 /* Run update version Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1026,7 +1029,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n";
+			shellScript = "#!/bin/bash\nif [ $CONFIGURATION == Release ]; then\n\nbN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbN=$((bN + 1))\nbN=$(printf \"%d\" $bN)\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $bN\" \"$INFOPLIST_FILE\"\n\nfi\n";
 		};
 		9BB4BC76225B9B9F00559170 /* Run Swiftlint Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1108,6 +1111,7 @@
 				9BC9B12E1F5C960700C4DF17 /* PostCell.swift in Sources */,
 				9B25F50B2260A38E0057FBF9 /* VideosCollectionViewCell.swift in Sources */,
 				9BB2CA702264B05F0012ACD6 /* Favorite.swift in Sources */,
+				9BD4CBAE228C6B8B00836955 /* UIImageViewTheme.swift in Sources */,
 				9BD135FE2228089900A0B627 /* UISplitViewControllerExtension.swift in Sources */,
 				9BF356281F6208F70081BE90 /* UIColorExtensions.swift in Sources */,
 				9B25F50D2260A46D0057FBF9 /* VideoCollectionViewController.swift in Sources */,
