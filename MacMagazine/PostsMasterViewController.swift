@@ -53,6 +53,7 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	var direction: Direction = .up
 	var lastPage = -1
 	var openRecentPost = false
+	var viewDidAppear = false
 
 	var selectedIndexPath: IndexPath?
 	var links: [PostData] = []
@@ -124,6 +125,7 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		super.viewDidAppear(animated)
 
 		processSelection()
+		viewDidAppear = true
 	}
 
 	override func didReceiveMemoryWarning() {
@@ -350,6 +352,10 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	}
 
 	fileprivate func getLastSelection(_ completion: @escaping (IndexPath) -> Void) {
+		if openRecentPost {
+			completion(IndexPath(row: 0, section: 0))
+		}
+
 		guard let link = UserDefaults.standard.object(forKey: "selectedPostLink") as? String else {
 			completion(IndexPath(row: 0, section: 0))
 			return
@@ -481,22 +487,31 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 
 }
 
-// MARK: - Peek&Pop -
+// MARK: - Notifications for Peek&Pop and Push -
 
 extension PostsMasterViewController {
-	@objc func onShortcutActionLastPost(_ notification: Notification) {
-		openRecentPost = false
 
-		if Settings().isPad() {
-			processTabletSelection()
-		} else {
-			processPhoneSelection()
+	fileprivate func processOption(openRecentPost: Bool, push: String?) {
+		self.openRecentPost = openRecentPost
+
+		if !openRecentPost ||
+			viewDidAppear {
+			if Settings().isPad() {
+				processTabletSelection()
+			} else {
+				processPhoneSelection()
+			}
 		}
 	}
 
-	@objc func onShortcutActionRecentPost(_ notification: Notification) {
-		openRecentPost = true
+	@objc func onShortcutActionLastPost(_ notification: Notification) {
+		processOption(openRecentPost: false, push: nil)
 	}
+
+	@objc func onShortcutActionRecentPost(_ notification: Notification) {
+		processOption(openRecentPost: true, push: nil)
+	}
+
 }
 
 // MARK: - Common Methods -
