@@ -13,7 +13,7 @@
         <scene sceneID="KNm-9d-eYv">
             <objects>
                 <tabBarController id="Rqn-ok-aGY" sceneMemberID="viewController">
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="bfV-7o-pYQ">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="bfV-7o-pYQ" customClass="AppTabBar" customModule="MacMagazine" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -34,7 +34,7 @@
             <objects>
                 <navigationController title="PostsNavigation" id="kKX-hy-fjk" sceneMemberID="viewController">
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="MsF-jO-FlS">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="MsF-jO-FlS" customClass="AppNavigationBar" customModule="MacMagazine" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -76,11 +76,19 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Posts" id="Gac-4y-scy">
                         <barButtonItem key="leftBarButtonItem" image="fav_off" id="mos-l0-Ml2">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Acessar posts favoritos"/>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="isAccessibilityElement" value="YES"/>
+                            </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="showFavorites:" destination="Jej-5Q-aqJ" id="Xng-DI-R8j"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="search" id="Ml7-gR-vKk">
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="string" keyPath="accessibilityLabel" value="Buscar posts"/>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="isAccessibilityElement" value="YES"/>
+                            </userDefinedRuntimeAttributes>
                             <connections>
                                 <action selector="search:" destination="Jej-5Q-aqJ" id="dZ9-cr-Rlt"/>
                             </connections>
@@ -112,7 +120,7 @@
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
             </objects>
-            <point key="canvasLocation" x="425" y="-2919"/>
+            <point key="canvasLocation" x="425" y="-2885"/>
         </scene>
         <!--Posts Detail View Controller-->
         <scene sceneID="fYa-LD-1Wl">
@@ -142,7 +150,7 @@
             <objects>
                 <navigationController title="PostsDetailNavigation" automaticallyAdjustsScrollViewInsets="NO" id="fD0-My-KZk" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="J71-xY-G4C">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="J71-xY-G4C" customClass="AppNavigationBar" customModule="MacMagazine" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -173,7 +181,7 @@
                 </viewControllerPlaceholder>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="C6w-Ql-N2F" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-2549" y="-2017"/>
+            <point key="canvasLocation" x="-2563" y="-2018"/>
         </scene>
         <!--Podcast-->
         <scene sceneID="vrS-A0-pzw">
@@ -188,8 +196,8 @@
     </scenes>
     <resources>
         <image name="fav_off" width="21" height="21"/>
-        <image name="logo" width="80" height="68.5"/>
-        <image name="logo_dark" width="80" height="68.5"/>
+        <image name="logo" width="415" height="350"/>
+        <image name="logo_dark" width="509" height="419"/>
         <image name="tab_posts" width="22" height="24"/>
     </resources>
     <inferredMetricsTieBreakers>

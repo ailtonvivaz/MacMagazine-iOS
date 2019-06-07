@@ -18,6 +18,7 @@ extension Notification.Name {
 	static let reloadWeb = Notification.Name("reloadWeb")
 	static let scrollToTop = Notification.Name("scrollToTop")
 	static let favoriteUpdated = Notification.Name("favoriteUpdated")
+	static let updateSelectedPost = Notification.Name("updateSelectedPost")
 }
 
 // MARK: - Setup -
@@ -25,7 +26,7 @@ extension Notification.Name {
 extension AppDelegate {
 	func setup(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
 		// Apply custom thmee (Dark/Light)
-		applyTheme()
+		Settings().applyTheme()
 
 		// Apple Watch Session
 		WatchSessionManager.shared.startSession()
@@ -37,17 +38,6 @@ extension AppDelegate {
 
 		// Push Notification
 		PushNotification().setup(options: launchOptions)
-	}
-
-	fileprivate func applyTheme() {
-		guard let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool else {
-			let theme: Theme = LightTheme()
-			theme.apply(for: UIApplication.shared)
-
-			return
-		}
-		let theme: Theme = isDarkMode ? DarkTheme() : LightTheme()
-		theme.apply(for: UIApplication.shared)
 	}
 }
 
@@ -72,7 +62,8 @@ extension AppDelegate: UITabBarControllerDelegate {
 		if let navVC = viewController as? UINavigationController,
 			let vc = navVC.children[0] as? UITableViewController {
 			if previousController == vc {
-				vc.tableView.setContentOffset(.zero, animated: true)
+				vc.tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .bottom)
+				vc.tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
 			}
 			previousController = vc
 		} else if let navVC = viewController as? UINavigationController,
@@ -91,8 +82,15 @@ extension AppDelegate: UITabBarControllerDelegate {
 					navVC.visibleViewController == detail {
 					navVC.popViewController(animated: true)
 				} else {
-					vc.tableView.setContentOffset(.zero, animated: true)
+					vc.tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .bottom)
+					vc.tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
 				}
+			}
+			previousController = vc
+		} else if let navVC = viewController as? UINavigationController,
+			let vc = navVC.children[0] as? VideoCollectionViewController {
+			if previousController == vc {
+				vc.collectionView.setContentOffset(.zero, animated: true)
 			}
 			previousController = vc
 		}

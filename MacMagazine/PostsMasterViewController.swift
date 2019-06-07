@@ -75,8 +75,12 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionLastPost(_:)), name: .shortcutActionLastPost, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionRecentPost(_:)), name: .shortcutActionRecentPost, object: nil)
 
-		self.navigationItem.titleView = logoView
-		self.navigationItem.title = nil
+		if Settings().isPad() {
+			NotificationCenter.default.addObserver(self, selector: #selector(onUpdateSelectedPost(_:)), name: .updateSelectedPost, object: nil)
+		}
+
+		navigationItem.titleView = logoView
+		navigationItem.title = nil
 
 		fetchController = FetchedResultsControllerDataSource(withTable: self.tableView, group: "headerDate", featuredCellNib: "FeaturedCell")
         fetchController?.delegate = self
@@ -87,7 +91,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		resultsTableController = ResultsViewController()
 		resultsTableController?.delegate = self
 		resultsTableController?.isPodcast = false
-		resultsTableController?.isSearching = false
 
 		searchController = UISearchController(searchResultsController: resultsTableController)
 		searchController?.searchBar.autocapitalizationType = .none
@@ -224,7 +227,10 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 
 	@IBAction private func search(_ sender: Any) {
 		navigationItem.searchController = searchController
+		resultsTableController?.showTyping()
 		searchController?.searchBar.becomeFirstResponder()
+
+		Settings().applyTheme()
 	}
 
 	@IBAction private func getPosts(_ sender: Any) {
@@ -401,7 +407,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 						$0.pubDate.toDate().sortedDate().compare($1.pubDate.toDate().sortedDate()) == .orderedDescending
 					})
 					self.resultsTableController?.posts = self.posts
-					self.resultsTableController?.isSearching = false
 				}
 				return
 			}
@@ -416,17 +421,22 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 // MARK: - UISearchBarDelegate -
 
 extension PostsMasterViewController: UISearchBarDelegate {
+	func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+		resultsTableController?.showTyping()
+	}
+
 	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
 		guard let text = searchBar.text else {
 			return
 		}
 		resultsTableController?.posts = []
-		resultsTableController?.isSearching = true
+		resultsTableController?.showSpin()
 		searchPosts(text)
 	}
 
 	func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
 		posts = []
+		resultsTableController?.posts = posts
 		searchBar.resignFirstResponder()
 		navigationItem.searchController = nil
 	}
@@ -444,7 +454,6 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 				return nil
 		}
 		tableView.selectRow(at: indexPath, animated: false, scrollPosition: .none)
-		selectedIndexPath = indexPath
 		previewingContext.sourceRect = tableView.rectForRow(at: indexPath)
 
 		guard let webController = createWebViewController(post: PostData(title: post.title, link: post.link, thumbnail: post.artworkURL, favorito: post.favorite)) as? WebViewController else {
@@ -456,6 +465,10 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 	}
 
 	func previewingContext(_ previewingContext: UIViewControllerPreviewing, commit viewControllerToCommit: UIViewController) {
+		guard let index = self.tableView.indexPathForSelectedRow else {
+			return
+		}
+		selectedIndexPath = index
 		self.links = fetchController?.links() ?? []
 		self.performSegue(withIdentifier: "showDetail", sender: self)
 	}
@@ -479,6 +492,10 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 	}
 
 	func previewActionCancel() {
+		// Just in case, return the default theme colors
+		let theme: Theme = Settings().isDarkMode() ? DarkTheme() : LightTheme()
+		theme.apply(for: UIApplication.shared)
+
 		guard let index = self.tableView.indexPathForSelectedRow else {
 			return
 		}
@@ -487,7 +504,23 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 
 }
 
-// MARK: - Notifications for Peek&Pop and Push -
+// MARK: - Notifications -
+
+extension PostsMasterViewController {
+	@objc func onUpdateSelectedPost(_ notification: Notification) {
+		guard let link = notification.object as? String else {
+			return
+		}
+		CoreDataStack.shared.get(post: link) { posts in
+			let indexPath = self.fetchController?.indexPath(for: posts[0]) ?? IndexPath(row: 0, section: 0)
+			self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .bottom)
+			UserDefaults.standard.set(link, forKey: "selectedPostLink")
+			UserDefaults.standard.synchronize()
+		}
+	}
+}
+
+// MARK: - Peek&Pop -
 
 extension PostsMasterViewController {
 

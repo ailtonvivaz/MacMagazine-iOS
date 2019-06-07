@@ -71,6 +71,30 @@ struct Settings {
 
 }
 
+extension Settings {
+	func applyTheme() {
+		guard let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool else {
+			let theme: Theme = LightTheme()
+			theme.apply(for: UIApplication.shared)
+			return
+		}
+		let theme: Theme = isDarkMode ? DarkTheme() : LightTheme()
+		theme.apply(for: UIApplication.shared)
+	}
+
+	func applyLightTheme() {
+		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool, isDarkMode {
+			UIApplication.shared.keyWindow?.tintColor = LightTheme().tint
+		}
+	}
+
+	func applyDarkTheme() {
+		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool, isDarkMode {
+			UIApplication.shared.keyWindow?.tintColor = DarkTheme().tint
+		}
+	}
+}
+
 enum PushPreferences {
 	static let featured = "featured_posts"
 	static let all = "all_posts"

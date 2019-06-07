@@ -9,8 +9,11 @@
 import UIKit
 import WebKit
 
+class AppTabBar: UITabBar {}
+class AppNavigationBar: UINavigationBar {}
 class AppButton: UIButton {}
 class AppSegmentedControl: UISegmentedControl {}
+class AppCollectionViewCell: UICollectionViewCell {}
 
 protocol Theme {
 	var hightlightLogo: Bool { get }
@@ -36,6 +39,8 @@ protocol Theme {
     var subtleLabelColor: UIColor { get }
     var textColor: UIColor { get }
     var placeholderTextColor: UIColor { get }
+
+	var keyboardStyle: UIKeyboardAppearance { get }
 
     func apply(for application: UIApplication)
     func extend()
@@ -67,7 +72,7 @@ extension Theme {
 
         // TABBAR
 
-        UITabBar.appearance().with {
+        AppTabBar.appearance().with {
             $0.barStyle = barStyle
             $0.barTintColor = barTintColor
             $0.tintColor = tint
@@ -76,7 +81,7 @@ extension Theme {
 
         // NAVBAR
 
-        UINavigationBar.appearance().with {
+        AppNavigationBar.appearance().with {
             $0.barStyle = barStyle
             $0.barTintColor = barTintColor
             $0.tintColor = tint
@@ -101,6 +106,7 @@ extension Theme {
 		UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).with {
 			$0.textColor = textColor
 			$0.placeholderColor = placeholderTextColor
+			$0.keyboardAppearance = keyboardStyle
 		}
 
         // TABLEVIEW
@@ -110,7 +116,7 @@ extension Theme {
             $0.separatorColor = separatorColor
         }
 
-        UITableViewCell.appearance().with {
+        AppTableViewCell.appearance().with {
             $0.backgroundColor = .clear
             $0.contentColor = cellBackgroundColor
             $0.selectionColor = selectionColor
@@ -128,7 +134,7 @@ extension Theme {
 		UICollectionView.appearance().with {
 			$0.backgroundColor = backgroundColor
 		}
-		UICollectionViewCell.appearance().with {
+		AppCollectionViewCell.appearance().with {
 			$0.backgroundColor = cellBackgroundColor
 		}
 
@@ -146,10 +152,13 @@ extension Theme {
             }
         }
 
-        UILabel.appearance().with {
+        AppLabel.appearance(whenContainedInInstancesOf: [AppTableViewCell.self]).with {
             $0.textColor = labelColor
-            $0.fontSize = CGFloat(fontSize)
         }
+		UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).with {
+			$0.textColor = headerFooterColor
+			$0.fontSize = CGFloat(0.8)
+		}
 		AppLabel.appearance().with {
 			$0.textColor = .black
 		}
@@ -160,10 +169,6 @@ extension Theme {
         AppSubhead.appearance().with {
             $0.textColor = secondaryLabelColor
             $0.fontSize = CGFloat(fontSize)
-        }
-        UILabel.appearance(whenContainedInInstancesOf: [UITableViewHeaderFooterView.self]).with {
-            $0.textColor = headerFooterColor
-            $0.fontSize = CGFloat(0.8)
         }
         AppSmallFont.appearance().with {
             $0.textColor = labelColor
@@ -182,11 +187,12 @@ extension Theme {
 			$0.fontSize = CGFloat(0.9)
 		}
 
-        // BUTTON
+		// BUTTON
 
-        UIButton.appearance().with {
+        UIButton.appearance(whenContainedInInstancesOf: [AppTableViewCell.self]).with {
             $0.setTitleColor(tint, for: .normal)
             $0.borderColor = tint
+			$0.backgroundColor = .clear
         }
 
 		AppButton.appearance().tintColor = tint
@@ -225,7 +231,7 @@ extension Theme {
 
 		UIActivityIndicatorView.appearance().color = tint
 
-        extend()
+		extend()
 
         // Ensure existing views render with new theme
         // https://developer.apple.com/documentation/uikit/uiappearance

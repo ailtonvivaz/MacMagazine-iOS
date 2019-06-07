@@ -8,11 +8,14 @@
 
 import UIKit
 
-class API: NSObject, XMLParserDelegate {
+class API {
 
 	// MARK: - Definitions -
 
 	enum APIParams {
+		// Disqus
+		static let disqus = "disqus.com"
+
 		// Wordpress
 		static let feed = "https://macmagazine.uol.com.br/feed/"
 		static let paged = "paged="
@@ -52,10 +55,6 @@ class API: NSObject, XMLParserDelegate {
 	// MARK: - Properties -
 
     var onCompletion: ((XMLPost?) -> Void)?
-    var currentPost = XMLPost()
-    var processItem = false
-    var value = ""
-    var attributes: [String: String]?
 	var isComplication = false
 
 	#if os(iOS)
@@ -64,6 +63,27 @@ class API: NSObject, XMLParserDelegate {
 	#endif
 
     // MARK: - Public methods -
+
+	func getCookies() -> [HTTPCookie]? {
+		let cookieStore = HTTPCookieStorage.shared
+		return cookieStore.cookies
+	}
+
+	func getDisqusCookies() -> [HTTPCookie] {
+		let disqus = getCookies()?.filter {
+			return $0.domain.contains(APIParams.disqus)
+		}
+		return disqus ?? []
+	}
+
+	func cleanCookies() {
+		let cookieStore = HTTPCookieStorage.shared
+		for cookie in getCookies() ?? [] {
+			if !cookie.domain.contains(APIParams.disqus) {
+				cookieStore.deleteCookie(cookie)
+			}
+		}
+	}
 
 	func getComplications(_ completion: ((XMLPost?) -> Void)?) {
 		isComplication = true
@@ -97,10 +117,7 @@ class API: NSObject, XMLParserDelegate {
     // MARK: - Internal methods -
 
     fileprivate func executeGetContent(_ host: String) {
-        let cookieStore = HTTPCookieStorage.shared
-        for cookie in cookieStore.cookies ?? [] {
-            cookieStore.deleteCookie(cookie)
-        }
+		cleanCookies()
 
         guard let url = URL(string: "\(host.escape())") else {
             return
@@ -120,10 +137,17 @@ class API: NSObject, XMLParserDelegate {
 				self.onCompletion?(nil)
                 return
             }
-            let parser = XMLParser(data: data)
-            parser.delegate = self
-            parser.parse()
+            self.parse(data, onCompletion: self.onCompletion, isComplication: self.isComplication)
         }
     }
 
+}
+
+extension API {
+	func parse(_ data: Data, onCompletion: ((XMLPost?) -> Void)?, isComplication: Bool) {
+		let parser = XMLParser(data: data)
+		let apiParser = APIXMLParser(onCompletion: onCompletion, isComplication: isComplication)
+		parser.delegate = apiParser
+		parser.parse()
+	}
 }

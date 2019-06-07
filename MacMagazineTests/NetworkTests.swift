@@ -7,14 +7,15 @@
 //
 
 import XCTest
+@testable import MacMagazine
 
 // Tests to be performed:
 // 1) Get Posts from Wordpress
 // 2) Test that the proper XML was retrieved
-// 3) Create a mock test
-// 4) Test for the content of the mock data, adding to the XMLPost class
 
 class NetworkTests: XCTestCase {
+
+	let examplePost = ExamplePost()
 
 	override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -48,8 +49,8 @@ class NetworkTests: XCTestCase {
 				return
 			}
 			XCTAssertNotNil(xmlResponse, "Data should not be nil")
-			XCTAssertTrue(xmlResponse.contains("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"), "Response should be a valid XML")
-			XCTAssertTrue(xmlResponse.contains("<atom:link href=\"https://macmagazine.uol.com.br/feed/?paged=0\" rel=\"self\" type=\"application/rss+xml\" />"), "Response should come from a valid source")
+			XCTAssertTrue(xmlResponse.contains(self.examplePost.getValidXML()), "Response should be a valid XML")
+			XCTAssertTrue(xmlResponse.contains(self.examplePost.getValidProvider()), "Response should come from a valid source")
 
 			expectation.fulfill()
 		}
@@ -87,9 +88,9 @@ class NetworkTests: XCTestCase {
 				expectation.fulfill()
 				return
 			}
-			XCTAssertNotEqual(post.title, "", "API response title should not be nil")
-			XCTAssertNotEqual(post.link, "", "API response title should not be nil")
-			XCTAssertNotEqual(post.pubDate, "", "API response title should not be nil")
+			XCTAssertNotEqual(post.title, "", "API response title should not be empty")
+			XCTAssertNotEqual(post.link, "", "API response link should not be empty")
+			XCTAssertNotEqual(post.pubDate, "", "API response date should not be empty")
 		}
 		waitForExpectations(timeout: 30) { error in
 			XCTAssertNil(error, "Error occurred: \(String(describing: error))")

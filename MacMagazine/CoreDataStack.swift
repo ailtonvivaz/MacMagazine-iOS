@@ -30,7 +30,8 @@ class CoreDataStack {
 			}
 			fatalError("Unresolved error: \(error), \(error.userInfo)")
 		}
-
+		// To prevent duplicates, ignore any object that came later
+		container.viewContext.mergePolicy = NSRollbackMergePolicy
 		return container
 	}()
 
@@ -270,4 +271,11 @@ class CoreDataStack {
 		video.views = item.views
 	}
 
+}
+
+extension CoreDataStack {
+	func delay(_ delay: Double, closure: @escaping () -> Void) {
+		let when = DispatchTime.now() + delay
+		DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
+	}
 }

@@ -51,17 +51,44 @@ class WebViewController: UIViewController {
 
 		// Do any additional setup after loading the view.
 		NotificationCenter.default.addObserver(self, selector: #selector(reload(_:)), name: .reloadWeb, object: nil)
-		NotificationCenter.default.addObserver(self, selector: #selector(onFavoriteUpdated(_:)), name: .favoriteUpdated, object: nil)
+
+		favorite.image = UIImage(named: post?.favorito ?? false ? "fav_on" : "fav_off")
+		self.parent?.navigationItem.rightBarButtonItems = [share, favorite]
 
 		webView?.navigationDelegate = self
 		webView?.uiDelegate = self
 
-		favorite.image = UIImage(named: post?.favorito ?? false ? "fav_on" : "fav_off")
-
-		self.parent?.navigationItem.rightBarButtonItems = [share, favorite]
-
-		reload()
+		// Make sure that all cookies are loaded before
+		// That's prevent Disqus from being loogoff
+		let cookies = API().getDisqusCookies()
+		var cookiesLeft = cookies.count
+		if cookies.isEmpty {
+			reload()
+		} else {
+			cookies.forEach { cookie in
+				webView?.configuration.websiteDataStore.httpCookieStore.setCookie(cookie) {
+					cookiesLeft -= 1
+					if cookiesLeft <= 0 {
+						DispatchQueue.main.async {
+							self.reload()
+						}
+					}
+				}
+			}
+		}
     }
+
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+
+		NotificationCenter.default.addObserver(self, selector: #selector(onFavoriteUpdated(_:)), name: .favoriteUpdated, object: nil)
+	}
+
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+
+		NotificationCenter.default.removeObserver(self, name: .favoriteUpdated, object: nil)
+	}
 
 	// MARK: - Local methods -
 
@@ -129,6 +156,10 @@ class WebViewController: UIViewController {
 		let cancelar = UIPreviewAction(title: "Cancelar", style: .destructive) { [weak self] _, _  in
 			self?.delegate?.previewActionCancel()
 		}
+
+		// Temporary change the colors
+		Settings().applyLightTheme()
+
 		return [favoritar, compartilhar, cancelar]
 	}
 
@@ -261,15 +292,23 @@ extension WebViewController {
 	func openInSafari(_ url: URL) {
 		if url.scheme?.lowercased().contains("http") ?? false {
 			let safari = SFSafariViewController(url: url)
-
-			let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool ?? false
-			safari.preferredBarTintColor = isDarkMode ? UIColor.black : UIColor.white
-
+			if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool, isDarkMode {
+				safari.preferredBarTintColor = UIColor.black
+			}
+			safari.dismissButtonStyle = .close
 			safari.modalPresentationStyle = .overFullScreen
+
 			self.present(safari, animated: true, completion: nil)
 		}
 	}
 
+}
+
+extension WebViewController {
+	func delay(_ delay: Double, closure: @escaping () -> Void) {
+		let when = DispatchTime.now() + delay
+		DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
+	}
 }
 
 // MARK: - Extensions -
