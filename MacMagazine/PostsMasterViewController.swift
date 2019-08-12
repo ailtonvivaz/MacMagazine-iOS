@@ -73,7 +73,9 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		super.viewDidLoad()
 
 		// Do any additional setup after loading the view, typically from a nib.
-		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionLastPost(_:)), name: .shortcutActionLastPost, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onRefreshAfterBackground(_:)), name: .refreshAfterBackground, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionLastPost(_:)), name: .shortcutActionLastPost, object: nil)
 		NotificationCenter.default.addObserver(self, selector: #selector(onShortcutActionRecentPost(_:)), name: .shortcutActionRecentPost, object: nil)
 
 		if Settings().isPad() {
@@ -103,20 +105,21 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		tableView.rowHeight = UITableView.automaticDimension
 		tableView.estimatedRowHeight = 133
 
-		if traitCollection.forceTouchCapability == .available {
-			registerForPreviewing(with: self, sourceView: self.tableView)
-		}
-
-		// Execute the fetch to display the data
-		fetchController?.reloadData()
-	}
+        // Execute the fetch to display the data
+        fetchController?.reloadData()
+    }
 
 	override func viewWillAppear(_ animated: Bool) {
 		clearsSelectionOnViewWillAppear = Settings().isPad()
 
         super.viewWillAppear(animated)
 
-		if Settings().isPhone() {
+        guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
+            return
+        }
+        delegate.supportedInterfaceOrientation = Settings().isPhone() ? .portrait : .all
+
+        if Settings().isPhone() {
 			selectedIndexPath = nil
 		}
 
@@ -132,10 +135,16 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		viewDidAppear = true
 	}
 
-	override func didReceiveMemoryWarning() {
+    override func didReceiveMemoryWarning() {
 		super.didReceiveMemoryWarning()
 		// Dispose of any resources that can be recreated.
 	}
+
+    func setup() {
+        if traitCollection.forceTouchCapability == .available {
+            registerForPreviewing(with: self, sourceView: self.tableView)
+        }
+    }
 
 	// MARK: - Scroll detection -
 
@@ -172,10 +181,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	}
 
 	// MARK: - View Methods -
-
-	func showActionSheet(_ view: UIView?, for items: [Any]) {
-		Share().present(at: view, using: items)
-	}
 
 	func willDisplayCell(indexPath: IndexPath) {
 		if direction == .down {
@@ -220,8 +225,20 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 
 	func didSelectResultRowAt(indexPath: IndexPath) {
 		selectedIndexPath = indexPath
-		self.links = posts.map { PostData(title: $0.title, link: $0.link, thumbnail: $0.artworkURL, favorito: false) }
+		self.links = posts.map { PostData(title: $0.title, link: $0.link, thumbnail: $0.artworkURL, favorito: $0.favorite) }
 		self.performSegue(withIdentifier: "showDetail", sender: self)
+	}
+
+	func setFavorite(_ favorited: Bool, atIndexPath: IndexPath) {
+		var object = posts[atIndexPath.row]
+		object.favorite = favorited
+
+		posts[atIndexPath.row] = object
+		self.resultsTableController?.posts = self.posts
+
+		if let cell = self.resultsTableController?.tableView.cellForRow(at: atIndexPath) as? PostCell {
+			cell.configureSearchPost(object)
+		}
 	}
 
 	// MARK: - Actions methods -
@@ -505,7 +522,8 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 		}
 
 		let items: [Any] = [post?.title ?? "", url]
-		showActionSheet(nil, for: items)
+		let view: UIView? = nil
+		Share().present(at: view, using: items)
 	}
 
 	func previewActionCancel() {
@@ -524,6 +542,12 @@ extension PostsMasterViewController: UIViewControllerPreviewingDelegate, WebView
 // MARK: - Notifications -
 
 extension PostsMasterViewController {
+    @objc func onRefreshAfterBackground(_ notification: Notification) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.getPosts(paged: 0)
+        }
+    }
+
 	@objc func onUpdateSelectedPost(_ notification: Notification) {
 		guard let link = notification.object as? String else {
 			return
