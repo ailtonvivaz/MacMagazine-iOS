@@ -32,6 +32,10 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
     var play: ((Podcast?) -> Void)?
 	var selectedIndex: IndexPath?
 
+    var showSpin: (() -> Void)?
+    var hideSpin: (() -> Void)?
+	var isLoading = false
+
 	// MARK: - View Lifecycle -
 
 	override func viewDidLoad() {
@@ -67,17 +71,36 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 		// Dispose of any resources that can be recreated.
 	}
 
-	// MARK: - Scroll detection -
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        userActivity?.invalidate()
+    }
+
+    // MARK: - Scroll detection -
 
 	@objc func onScrollToTop(_ notification: Notification) {
 		tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .bottom)
 		tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
 	}
 
+	override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+		if isLoading {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+				self.getPodcasts(paged: 0)
+			}
+		}
+	}
+
 	override func scrollViewDidScroll(_ scrollView: UIScrollView) {
 		let offset = scrollView.contentOffset
 		direction = offset.y > lastContentOffset.y ? .down : .up
 		lastContentOffset = offset
+
+        // Pull to Refresh
+        if offset.y < -100 {
+			showSpin?()
+			isLoading = true
+		}
 	}
 
 	// MARK: - View Methods -
@@ -115,6 +138,16 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 		}
 		let podcast = Podcast(title: object.title, duration: object.duration, url: object.podcastURL, frame: object.podcastFrame)
 		play?(podcast)
+
+        // Handoff
+        guard let url = object.link else {
+            return
+        }
+        let handoff = NSUserActivity(activityType: "com.brit.macmagazine.details")
+        handoff.title = object.title
+        handoff.webpageURL = URL(string: url)
+        userActivity = handoff
+        userActivity?.becomeCurrent()
     }
 
     func configureResult(cell: PostCell, atIndexPath: IndexPath) {
@@ -148,14 +181,6 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 		}
 	}
 
-	// MARK: - Actions methods -
-
-	@IBAction private func getPodcasts() {
-		DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-			self.getPodcasts(paged: 0)
-		}
-	}
-
     // MARK: - Public methods -
 
     func showFavoritesAction() {
@@ -178,39 +203,27 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
     // MARK: - Local methods -
 
     fileprivate func hasData() -> Bool {
-        return (fetchController?.hasData() ?? false) && !(self.refreshControl?.isRefreshing ?? true)
+        return fetchController?.hasData() ?? false
     }
 
 	fileprivate func getPodcasts(paged: Int) {
-		let getPodcast = {
-			API().getPodcasts(page: paged) { post in
-				DispatchQueue.main.async {
-					guard let post = post else {
-						// When post == nil, indicates the last post retrieved
-						self.fetchController?.reloadData()
-						if paged < 1 {
-							self.refreshControl?.endRefreshing()
-						}
-						return
-					}
-					if !post.duration.isEmpty {
-						CoreDataStack.shared.save(post: post)
-					}
-				}
-			}
-		}
+        showSpin?()
+        API().getPodcasts(page: paged) { post in
+            DispatchQueue.main.async {
+				self.isLoading = false
+                self.hideSpin?()
 
-		if paged < 1 {
-			self.tableView.setContentOffset(CGPoint(x: 0, y: 0), animated: false)
-			UIView.animate(withDuration: 0.4, animations: {
-				self.tableView.setContentOffset(CGPoint(x: 0, y: -(self.refreshControl?.frame.size.height ?? 88)), animated: false)
-			}, completion: { _ in
-				self.refreshControl?.beginRefreshing()
-				getPodcast()
-			})
-		} else {
-			getPodcast()
-		}
+                guard let post = post else {
+                    // When post == nil, indicates the last post retrieved
+                    self.fetchController?.reloadData()
+                    return
+                }
+                if !post.duration.isEmpty {
+                    CoreDataStack.shared.save(post: post)
+                }
+            }
+        }
+
 	}
 
 	func searchPodcasts(_ text: String) {

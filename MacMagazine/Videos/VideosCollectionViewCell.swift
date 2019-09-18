@@ -44,7 +44,7 @@ class VideosCollectionViewCell: AppCollectionViewCell {
 			return
 		}
 		thumbnailImageView.kf.indicatorType = .activity
-		thumbnailImageView.kf.setImage(with: URL(string: artworkURL), placeholder: UIImage(named: "image_logo_feature\(Settings().isDarkMode() ? "_dark" : "")"))
+		thumbnailImageView.kf.setImage(with: URL(string: artworkURL), placeholder: UIImage(named: "image_logo_feature\(Settings().darkModeimage)"))
 
 		youtubeWebView?.scrollView.isScrollEnabled = false
 		youtubeWebView?.configuration.userContentController.removeScriptMessageHandler(forName: "videoPaused")
@@ -65,7 +65,7 @@ class VideosCollectionViewCell: AppCollectionViewCell {
 		likesLabel.text = object.likes
 
 		thumbnailImageView.kf.indicatorType = .activity
-		thumbnailImageView.kf.setImage(with: URL(string: object.artworkURL), placeholder: UIImage(named: "image_logo_feature\(Settings().isDarkMode() ? "_dark" : "")"))
+		thumbnailImageView.kf.setImage(with: URL(string: object.artworkURL), placeholder: UIImage(named: "image_logo_feature\(Settings().darkModeimage)"))
 
 		youtubeWebView?.scrollView.isScrollEnabled = false
 		youtubeWebView?.configuration.userContentController.removeScriptMessageHandler(forName: "videoPaused")
@@ -80,7 +80,14 @@ class VideosCollectionViewCell: AppCollectionViewCell {
 		thumbnailImageView.isHidden = true
 		playButton.isHidden = true
 		youtubeWebView?.play()
-	}
+
+        // Handoff
+        let handoff = NSUserActivity(activityType: "com.brit.macmagazine.details")
+        handoff.title = headlineLabel.text
+        handoff.webpageURL = URL(string: "https://www.youtube.com/watch?v=\(youtubeWebView?.videoId ?? "")")
+        userActivity = handoff
+        userActivity?.becomeCurrent()
+    }
 
 	@IBAction private func share(_ sender: Any) {
 		guard let videoId = videoId,

@@ -88,6 +88,7 @@ class WebViewController: UIViewController {
 		super.viewWillDisappear(animated)
 
 		NotificationCenter.default.removeObserver(self, name: .favoriteUpdated, object: nil)
+        userActivity?.invalidate()
 	}
 
 	// MARK: - Local methods -
@@ -101,17 +102,25 @@ class WebViewController: UIViewController {
 				return
 		}
 
-		if webView?.url != url ||
+        if webView?.url != url ||
 			forceReload {
 			loadWebView(url: url)
-		}
+
+            // Handoff
+            userActivity?.invalidate()
+
+            let handoff = NSUserActivity(activityType: "com.brit.macmagazine.details")
+            handoff.title = post.title
+            handoff.webpageURL = URL(string: link)
+            userActivity = handoff
+        }
 	}
 
 	func loadWebView(url: URL) {
 		UserDefaults.standard.removeObject(forKey: "offset")
 
 		// Changes the WKWebView user agent in order to hide some CSS/HT elements
-		webView?.customUserAgent = "MacMagazine\(Settings().getDarkModeUserAgent())\(Settings().getFontSizeUserAgent())"
+		webView?.customUserAgent = "MacMagazine\(Settings().darkModeUserAgent)\(Settings().fontSizeUserAgent)"
 		webView?.allowsBackForwardNavigationGestures = false
 		webView?.load(URLRequest(url: url))
 
@@ -187,7 +196,7 @@ extension WebViewController {
 	}
 
 	@objc func onFavoriteUpdated(_ notification: Notification) {
-		if Settings().isPad() {
+		if Settings().isPad {
 			guard let object = notification.object as? Post else {
 				return
 			}
@@ -208,7 +217,9 @@ extension WebViewController: WKNavigationDelegate, WKUIDelegate {
 	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation) {
 		self.parent?.navigationItem.rightBarButtonItems = [share, favorite]
 		self.navigationItem.rightBarButtonItems = nil
-	}
+
+        userActivity?.becomeCurrent()
+}
 
 	func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
 

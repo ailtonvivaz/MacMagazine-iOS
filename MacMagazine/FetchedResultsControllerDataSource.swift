@@ -14,6 +14,7 @@ protocol FetchedResultsControllerDelegate: AnyObject {
 	func didSelectRowAt(indexPath: IndexPath)
 	func configure(cell: PostCell, atIndexPath: IndexPath)
 	func scrollViewDidScroll(_ scrollView: UIScrollView)
+	func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool)
 }
 
 extension FetchedResultsControllerDelegate {
@@ -38,7 +39,7 @@ class FetchedResultsControllerDataSource: NSObject, UITableViewDataSource, UITab
 	fileprivate lazy var fetchedResultsController: NSFetchedResultsController = { () -> NSFetchedResultsController<Post> in
 		// Initialize Fetched Results Controller
 		let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
-		controller.delegate = self
+//		controller.delegate = self
 
 		return controller
 	}()
@@ -67,6 +68,10 @@ class FetchedResultsControllerDataSource: NSObject, UITableViewDataSource, UITab
 		delegate?.scrollViewDidScroll(scrollView)
 	}
 
+	func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+		delegate?.scrollViewDidEndDragging(scrollView, willDecelerate: decelerate)
+	}
+
 	// MARK: - TableView methods -
 
 	func numberOfSections(in tableView: UITableView) -> Int {
@@ -76,7 +81,7 @@ class FetchedResultsControllerDataSource: NSObject, UITableViewDataSource, UITab
 
 			let notFound = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height))
 			notFound.text = "Você ainda não favoritou nenhum \(self.groupedBy == nil ? "podcast" : "post")."
-			notFound.textColor = Settings().isDarkMode() ? .white : .black
+			notFound.textColor = Settings().darkModeColor
 			notFound.textAlignment = .center
 			tableView.backgroundView = notFound
 			tableView.separatorStyle = .none
