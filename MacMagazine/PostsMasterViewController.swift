@@ -9,6 +9,7 @@
 import CoreData
 import CoreSpotlight
 import Kingfisher
+import SafariServices
 import UIKit
 
 // MARK: - Extensions -
@@ -47,8 +48,8 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	var detailViewController: PostsDetailViewController?
 
 	@IBOutlet private weak var logoView: UIView!
-	@IBOutlet private weak var favorite: UIBarButtonItem!
     @IBOutlet private weak var spin: UIActivityIndicatorView!
+    @IBOutlet private weak var favorite: UIBarButtonItem!
 
 	var lastContentOffset = CGPoint()
 	var direction: Direction = .up
@@ -64,8 +65,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	private var resultsTableController: ResultsViewController?
 	var posts = [XMLPost]()
 
-	var showFavorites = false
-    let categoryPredicate = NSPredicate(format: "NOT categorias CONTAINS[cd] %@", "Podcast")
     let favoritePredicate = NSPredicate(format: "favorite == %@", NSNumber(value: true))
 
     // MARK: - View Lifecycle -
@@ -88,7 +87,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 
 		fetchController = FetchedResultsControllerDataSource(withTable: self.tableView, group: "headerDate", featuredCellNib: "FeaturedCell")
         fetchController?.delegate = self
-		fetchController?.filteringFavorite = false
         fetchController?.fetchRequest.sortDescriptors = [NSSortDescriptor(key: "headerDate", ascending: false),
                                                          NSSortDescriptor(key: "pubDate", ascending: false)]
 
@@ -101,7 +99,8 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		searchController?.searchBar.delegate = self
 		searchController?.searchBar.placeholder = "Buscar nos posts..."
 		searchController?.hidesNavigationBarDuringPresentation = true
-		self.definesPresentationContext = true
+        self.definesPresentationContext = true
+        self.extendedLayoutIncludesOpaqueBars = true
 
 		tableView.rowHeight = UITableView.automaticDimension
 		tableView.estimatedRowHeight = 133
@@ -150,26 +149,37 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 	// MARK: - Segues -
 
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-		guard let navController = segue.destination as? UINavigationController,
-			let controller = navController.topViewController as? PostsDetailViewController,
-			let indexPath = selectedIndexPath
-			else {
-				return
-		}
+        if segue.identifier == "showCategories" {
+            guard let vc = segue.destination as? CategoriesTableViewController else {
+                return
+            }
+            vc.callback = { [weak self] category in
+                self?.searchPosts(category: category)
+            }
 
-		guard let _ = navigationItem.searchController else {
-			// Normal Posts table
-			if tableView.indexPathForSelectedRow != nil {
-				guard let post = fetchController?.object(at: indexPath) else {
+		} else {
+
+			guard let navController = segue.destination as? UINavigationController,
+				let controller = navController.topViewController as? PostsDetailViewController,
+				let indexPath = selectedIndexPath
+				else {
 					return
-				}
-				prepareDetailController(controller, using: links, compare: post.link)
 			}
-			return
-		}
-		// Search Posts table
-		if resultsTableController?.tableView.indexPathForSelectedRow != nil {
-			prepareDetailController(controller, using: links, compare: posts[indexPath.row].link)
+
+			guard let _ = navigationItem.searchController else {
+				// Normal Posts table
+				if tableView.indexPathForSelectedRow != nil {
+					guard let post = fetchController?.object(at: indexPath) else {
+						return
+					}
+					prepareDetailController(controller, using: links, compare: post.link)
+				}
+				return
+			}
+			// Search Posts table
+			if resultsTableController?.tableView.indexPathForSelectedRow != nil {
+				prepareDetailController(controller, using: links, compare: posts[indexPath.row].link)
+			}
 		}
 	}
 
@@ -234,41 +244,7 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		}
 	}
 
-	// MARK: - Actions methods -
-
-	@IBAction private func search(_ sender: Any) {
-		navigationItem.searchController = searchController
-		resultsTableController?.showTyping()
-		searchController?.searchBar.becomeFirstResponder()
-
-		Settings().applyTheme()
-	}
-
-	@IBAction private func showFavorites(_ sender: Any) {
-		showFavorites = !showFavorites
-        if showFavorites {
-			fetchController?.fetchRequest.predicate = favoritePredicate
-			fetchController?.filteringFavorite = true
-
-			self.navigationItem.titleView = nil
-			self.navigationItem.title = "Favoritos"
-			favorite.image = UIImage(named: "fav_on")
-        } else {
-			fetchController?.fetchRequest.predicate = nil
-			fetchController?.filteringFavorite = false
-
-			self.navigationItem.titleView = logoView
-			self.navigationItem.title = nil
-			favorite.image = UIImage(named: "fav_off")
-		}
-
-		fetchController?.reloadData()
-		UIView.transition(with: tableView, duration: 0.4, options: showFavorites ? .transitionFlipFromRight : .transitionFlipFromLeft, animations: {
-			self.tableView.reloadData()
-		})
-	}
-
-	// MARK: - Local methods -
+    // MARK: - Local methods -
 
     fileprivate func hasData() -> Bool {
         return (fetchController?.hasData() ?? false) && !spin.isAnimating
@@ -364,7 +340,7 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		if date.addingTimeInterval(12 * 60 * 60) > Date() ||
 			comeFrom3DTouch {
 			comeFrom3DTouch = false
-			CoreDataStack.shared.get(post: link) { posts in
+			CoreDataStack.shared.get(link: link) { posts in
 				completion(self.fetchController?.indexPath(for: posts[0]) ?? IndexPath(row: 0, section: 0))
 			}
 		} else {
@@ -400,29 +376,6 @@ class PostsMasterViewController: UITableViewController, FetchedResultsController
 		}
 	}
 
-	fileprivate func searchPosts(_ text: String) {
-		var items: [CSSearchableItem] = []
-
-		let processResponse: (XMLPost?) -> Void = { post in
-			guard let post = post else {
-				DispatchQueue.main.async {
-					self.posts.sort(by: {
-						$0.pubDate.toDate().sortedDate().compare($1.pubDate.toDate().sortedDate()) == .orderedDescending
-					})
-					CSSearchableIndex.default().indexSearchableItems(items)
-
-					self.resultsTableController?.posts = self.posts
-				}
-				return
-			}
-			self.posts.append(post)
-			CoreDataStack.shared.save(post: post)
-			items.append(self.createSearchableItem(post))
-		}
-		posts = []
-		API().searchPosts(text, processResponse)
-	}
-
 }
 
 // MARK: - Scroll detection -
@@ -442,7 +395,10 @@ extension PostsMasterViewController {
         lastContentOffset = offset
 
         // Pull to Refresh
-        if offset.y < -100 && navigationItem.titleView == logoView {
+        if offset.y < -100 &&
+            navigationItem.titleView == logoView &&
+            navigationItem.searchController == nil &&
+			fetchController?.fetchRequest.predicate == nil {
 			showSpin()
         }
     }
@@ -477,6 +433,7 @@ extension PostsMasterViewController: UISearchBarDelegate {
 		guard let text = searchBar.text else {
 			return
 		}
+		fetchController?.fetchRequest.predicate = nil
 		resultsTableController?.posts = []
 		resultsTableController?.showSpin()
 		searchPosts(text)
@@ -486,8 +443,8 @@ extension PostsMasterViewController: UISearchBarDelegate {
 		posts = []
 		resultsTableController?.posts = posts
 		searchBar.resignFirstResponder()
-		navigationItem.searchController = nil
-	}
+        navigationItem.searchController = nil
+    }
 }
 
 // MARK: - UIViewControllerPreviewingDelegate -
@@ -565,7 +522,7 @@ extension PostsMasterViewController {
 		guard let link = notification.object as? String else {
 			return
 		}
-		CoreDataStack.shared.get(post: link) { posts in
+		CoreDataStack.shared.get(link: link) { posts in
 			let indexPath = self.fetchController?.indexPath(for: posts[0]) ?? IndexPath(row: 0, section: 0)
 			self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: .bottom)
 
@@ -664,5 +621,137 @@ func showDetailController(with link: String) {
 				splitVC.showDetailViewController(navVC, sender: nil)
 			}
 		}
+	}
+}
+
+// MARK: - Easter Egg -
+
+extension PostsMasterViewController {
+    @IBAction private func easterEgg(_ sender: Any) {
+        let api = API().getMMURL()
+        let urls = ["\(api)sobre/",
+                    "\(api)usados-apple/",
+                    "\(api)equipe/",
+                    "\(api)patroes/",
+                    "\(api)tour/"
+        ]
+        guard let url = URL(string: urls[Int.random(in: 0..<urls.count)]) else {
+            return
+        }
+        openInSafari(url)
+    }
+
+    func openInSafari(_ url: URL) {
+        if url.scheme?.lowercased().contains("http") ?? false {
+            let safari = SFSafariViewController(url: url)
+            safari.setup()
+            self.present(safari, animated: true, completion: nil)
+        }
+    }
+}
+
+// MARK: - Favorite Action methods -
+
+extension PostsMasterViewController {
+    @IBAction private func showHideFavorites(_ sender: Any) {
+        if favorite.image == UIImage(named: "fav_on") {
+            favorite.image = UIImage(named: "fav_off")
+            hideFavorites()
+        } else {
+            favorite.image = UIImage(named: "fav_on")
+            showFavorites()
+        }
+    }
+
+    fileprivate func showFavorites() {
+        fetchController?.fetchRequest.predicate = favoritePredicate
+
+        self.navigationItem.titleView = nil
+        self.navigationItem.title = "Favoritos"
+
+        reloadController(.transitionFlipFromRight)
+    }
+
+    fileprivate func hideFavorites() {
+        fetchController?.fetchRequest.predicate = nil
+
+        self.navigationItem.titleView = logoView
+        self.navigationItem.title = nil
+
+        reloadController(.transitionFlipFromLeft)
+    }
+
+    fileprivate func reloadController(_ direction: UIView.AnimationOptions) {
+        fetchController?.reloadData()
+        UIView.transition(with: tableView,
+                          duration: 0.4,
+                          options: direction,
+                          animations: {
+            self.tableView.reloadData()
+        })
+    }
+}
+
+// MARK: - Search Action methods -
+
+extension PostsMasterViewController {
+    @IBAction private func search(_ sender: Any) {
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
+        resultsTableController?.showTyping()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            self.searchController?.searchBar.becomeFirstResponder()
+            Settings().applyTheme()
+        }
+    }
+
+	fileprivate func searchPosts(_ text: String) {
+		var items: [CSSearchableItem] = []
+		let processResponse: (XMLPost?) -> Void = { post in
+			guard let post = post else {
+				DispatchQueue.main.async {
+					self.posts.sort(by: {
+						$0.pubDate.toDate().sortedDate().compare($1.pubDate.toDate().sortedDate()) == .orderedDescending
+					})
+					CSSearchableIndex.default().indexSearchableItems(items)
+
+					self.resultsTableController?.posts = self.posts
+				}
+				return
+			}
+			self.posts.append(post)
+			CoreDataStack.shared.save(post: post)
+			items.append(self.createSearchableItem(post))
+		}
+
+		posts = []
+		API().searchPosts(text, processResponse)
+	}
+
+	fileprivate func searchPosts(category: String) {
+        showSpin()
+
+		var items: [CSSearchableItem] = []
+		let processResponse: (XMLPost?) -> Void = { post in
+			guard let post = post else {
+				DispatchQueue.main.async {
+                    self.hideSpin()
+
+					CSSearchableIndex.default().indexSearchableItems(items)
+
+					self.fetchController?.fetchRequest.predicate = NSPredicate(format: "categorias contains[cd] %@", category)
+					self.reloadController(.transitionFlipFromRight)
+				}
+				return
+			}
+			CoreDataStack.shared.save(post: post)
+			items.append(self.createSearchableItem(post))
+		}
+
+		if navigationItem.searchController == nil {
+		}
+
+		API().searchPosts(category: category, processResponse)
 	}
 }

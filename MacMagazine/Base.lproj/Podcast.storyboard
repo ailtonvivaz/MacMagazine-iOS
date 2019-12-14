@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="GbX-Zp-bIv">
-    <device id="retina6_1" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="GbX-Zp-bIv">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,7 +13,6 @@
                 <navigationController title="NoArNavigation" automaticallyAdjustsScrollViewInsets="NO" id="GbX-Zp-bIv" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Podcast" image="tab_noar" id="59e-2Y-DJH"/>
                     <toolbarItems/>
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translucent="NO" id="Tqr-74-5pJ" customClass="AppNavigationBar" customModule="MacMagazine" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -34,7 +31,7 @@
             <objects>
                 <tableViewController title="NoAr" clearsSelectionOnViewWillAppear="NO" id="dI9-bf-84Z" customClass="PodcastMasterViewController" customModule="MacMagazine" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="133" sectionHeaderHeight="1" sectionFooterHeight="1" id="M41-4U-Ums">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="559"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="608"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <sections/>
@@ -57,17 +54,17 @@
                         <viewControllerLayoutGuide type="bottom" id="Sxe-hu-yMD"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="SlD-dw-tjD" customClass="AppView" customModule="MacMagazine" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="725"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="808"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7Pr-nE-zS6">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="559"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="608"/>
                                 <connections>
                                     <segue destination="dI9-bf-84Z" kind="embed" id="Esd-kv-Aog"/>
                                 </connections>
                             </containerView>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="slx-MC-Tvc">
-                                <rect key="frame" x="0.0" y="559" width="414" height="166"/>
+                            <containerView opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="slx-MC-Tvc">
+                                <rect key="frame" x="0.0" y="608" width="414" height="166"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="166" id="3US-UY-uQE"/>
                                 </constraints>

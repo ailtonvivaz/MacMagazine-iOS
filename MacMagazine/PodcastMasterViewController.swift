@@ -14,7 +14,6 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 	// MARK: - Properties -
 
     var fetchController: FetchedResultsControllerDataSource?
-	var detailViewController: PostsDetailViewController?
 
 	var lastContentOffset = CGPoint()
 	var direction: Direction = .up
@@ -46,7 +45,6 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 
 		fetchController = FetchedResultsControllerDataSource(withTable: self.tableView, group: nil, featuredCellNib: "PodcastCell")
         fetchController?.delegate = self
-		fetchController?.filteringFavorite = false
         fetchController?.fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
 		let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, isPodcastPredicate])
 		fetchController?.fetchRequest.predicate = predicate
@@ -97,7 +95,8 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 		lastContentOffset = offset
 
         // Pull to Refresh
-        if offset.y < -100 {
+        if offset.y < -100 &&
+            navigationItem.searchController == nil {
 			showSpin?()
 			isLoading = true
 		}
@@ -186,7 +185,6 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
     func showFavoritesAction() {
         showFavorites = !showFavorites
 		var predicateArray = [categoryPredicate, isPodcastPredicate]
-		fetchController?.filteringFavorite = showFavorites
 
         if showFavorites {
 			predicateArray.append(favoritePredicate)

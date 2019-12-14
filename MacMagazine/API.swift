@@ -8,6 +8,13 @@
 
 import UIKit
 
+struct Category: Codable {
+    var title: String = ""
+    var parent: String = ""
+    var order: Int = 0
+    var id: Int = 0
+}
+
 class API {
 
 	// MARK: - Definitions -
@@ -17,11 +24,16 @@ class API {
 		static let disqus = "disqus.com"
 
 		// Wordpress
-		static let feed = "https://macmagazine.uol.com.br/feed/"
+        static let mm = "https://macmagazine.uol.com.br/"
+		static let feed = "\(mm)feed/"
 		static let paged = "paged="
-		static let posts = "cat=-101"
-		static let podcast = "cat=101"
+		static let cat = "cat="
+		static let posts = "\(cat)-101"
+		static let podcast = "\(cat)101"
 		static let search = "s="
+        static let restAPI = "\(mm)wp-json/menus/v2/"
+        static let categories = "categories"
+		static let tag = "tag="
 
 		// YouTube
 		static let salt = "AppDelegateNSObject"
@@ -41,7 +53,7 @@ class API {
 		static let pageToken = "pageToken="
 
 		static let statistics = "\(youtubeURL)/videos"
-		static let statisticsPart = "part=statistics"
+		static let statisticsPart = "part=statistics,contentDetails"
 		static let videoId = "id="
 
 		static let videoSearch = "\(youtubeURL)/search"
@@ -64,7 +76,11 @@ class API {
 
     // MARK: - Public methods -
 
-	func getCookies() -> [HTTPCookie]? {
+    func getMMURL() -> String {
+        return APIParams.mm
+    }
+
+    func getCookies() -> [HTTPCookie]? {
 		let cookieStore = HTTPCookieStorage.shared
 		return cookieStore.cookies
 	}
@@ -108,13 +124,59 @@ class API {
         executeGetContent(host)
     }
 
+    func searchPosts(category: String, _ completion: ((XMLPost?) -> Void)?) {
+        onCompletion = completion
+		let host = "\(APIParams.feed)?\(APIParams.tag)'\(category.replacingOccurrences(of: " ", with: "-"))'"
+        executeGetContent(host)
+    }
+
 	func searchPodcasts(_ text: String, _ completion: ((XMLPost?) -> Void)?) {
 		onCompletion = completion
 		let host = "\(APIParams.feed)?\(APIParams.podcast)&\(APIParams.search)'\(text)'"
 		executeGetContent(host)
 	}
 
+    func getCategories(_ completion: (([Category]?) -> Void)?) {
+        let host = "\(APIParams.restAPI)\(APIParams.categories)"
+
+        guard let url = URL(string: "\(host.escape())") else {
+            return
+        }
+
+        #if os(iOS)
+        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        #endif
+        Network.get(url: url) { (data: Data?, _: String?) in
+            #if os(iOS)
+            DispatchQueue.main.async {
+                UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            }
+            #endif
+
+            guard let data = data,
+                let categories = self.decodeJSON(data)
+            else {
+                completion?(nil)
+                return
+            }
+            DispatchQueue.main.async {
+                completion?(categories)
+            }
+        }
+    }
+
     // MARK: - Internal methods -
+
+    fileprivate func decodeJSON(_ data: Data) -> [Category]? {
+        let decoder = JSONDecoder()
+
+        do {
+            return try decoder.decode([Category].self, from: data)
+
+        } catch {
+            return nil
+        }
+    }
 
     fileprivate func executeGetContent(_ host: String) {
 		cleanCookies()

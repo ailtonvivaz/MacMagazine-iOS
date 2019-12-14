@@ -15,59 +15,98 @@ class SettingsTableViewController: UITableViewController {
 
     // MARK: - Properties -
 
-    @IBOutlet private weak var fontSize: UISlider!
-    @IBOutlet private weak var darkMode: UISwitch!
-    @IBOutlet private weak var reportProblem: UITableViewCell!
-
-	@IBOutlet private weak var iconOption1: UIImageView!
-	@IBOutlet private weak var iconOption2: UIImageView!
-    @IBOutlet private weak var iconOption3: UIImageView!
-
+    @IBOutlet private weak var reportProblem: AppTableViewCell!
 	@IBOutlet private weak var pushOptions: AppSegmentedControl!
 
-    var version: String = ""
+    @IBOutlet private weak var fontSize: UISlider!
+
+    @IBOutlet private weak var iconOption1: UIImageView!
+    @IBOutlet private weak var iconOption2: UIImageView!
+    @IBOutlet private weak var iconOption3: UIImageView!
+
+    @IBOutlet private weak var appearanceCell1: AppTableViewCell!
+    @IBOutlet private weak var appearanceCell2: AppTableViewCell!
+    @IBOutlet private weak var darkModeSystem: UISwitch!
+    @IBOutlet private weak var darkModeSegmentControl: AppSegmentedControl!
 
     // MARK: - View lifecycle -
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        tableView.backgroundColor = Settings().theme.backgroundColor
+        NotificationCenter.default.addObserver(self, selector: #selector(onRefreshAfterBackground(_:)), name: .refreshAfterBackground, object: nil)
 
-        version = getAppVersion()
+		pushOptions.selectedSegmentIndex = Settings().pushPreference
 
         let sliderFontSize = Settings().fontSize
         fontSize.value = sliderFontSize == "fontemenor" ? 0.0 : sliderFontSize == "fontemaior" ? 2.0 : 1.0
 
-		let iconName = UserDefaults.standard.string(forKey: Definitions.icon)
-		self.iconOption1.alpha = iconName ?? IconOptions.option1 == IconOptions.option1 ? 1 : 0.6
-		self.iconOption2.alpha = iconName ?? IconOptions.option1 == IconOptions.option2 ? 1 : 0.6
+        let iconName = UserDefaults.standard.string(forKey: Definitions.icon)
+        self.iconOption1.alpha = iconName ?? IconOptions.option1 == IconOptions.option1 ? 1 : 0.6
+        self.iconOption2.alpha = iconName ?? IconOptions.option1 == IconOptions.option2 ? 1 : 0.6
         self.iconOption3.alpha = iconName ?? IconOptions.option1 == IconOptions.option3 ? 1 : 0.6
 
-		pushOptions.selectedSegmentIndex = Settings().pushPreference
-
-		guard MFMailComposeViewController.canSendMail() else {
+        guard MFMailComposeViewController.canSendMail() else {
 			reportProblem.isHidden = true
 			return
 		}
-	}
+    }
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 
-        guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
+        tableView.backgroundColor = Settings().theme.backgroundColor
+        applyTheme()
+        setupAppearanceSettings()
+
+		guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
             return
         }
         delegate.supportedInterfaceOrientation = Settings().orientations
-
-        applyTheme()
 	}
 
 	// MARK: - TableView Methods -
 
+    fileprivate func getHeaders() -> [String] {
+        var header = ["MACMAGAZINE \(getAppVersion())"]
+		header.append("RECEBER PUSHES PARA")
+		header.append("ÍCONE DO APLICATIVO")
+		header.append("TAMANHO DA FONTE")
+		header.append("APARÊNCIA")
+		header.append("")
+        return header
+    }
+
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		let header = ["MACMAGAZINE \(version)", "RECEBER PUSHES PARA", "TAMANHO DA FONTE", "", "ÍCONE DO APLICATIVO", ""]
-		return header[section] == "" ? nil : header[section]
+        let header = getHeaders()
+        if header.isEmpty ||
+            (header.count - 1) < section ||
+            header[section] == "" {
+            return nil
+        }
+		return header[section]
+    }
+
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+		if indexPath.section == 4 {
+			if indexPath.row == 0 &&
+				appearanceCell1.isHidden {
+				return 0
+			}
+			if indexPath.row == 1 &&
+				appearanceCell2.isHidden {
+				return 0
+			}
+		}
+		if indexPath.section == 5 &&
+			reportProblem.isHidden {
+			return 0
+		}
+		return indexPath.section == 2 ? 74 : 50
+	}
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 
     // MARK: - View Methods -
@@ -87,45 +126,8 @@ class SettingsTableViewController: UITableViewController {
 		alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in
 			self.dismiss(animated: true)
 		})
-		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool, isDarkMode {
-			alertController.view.tintColor = LightTheme().tint
-		}
+        alertController.setup()
 		self.present(alertController, animated: true)
-	}
-
-    @IBAction private func changeFontSize(_ sender: Any) {
-        guard let slider = sender as? UISlider else {
-            return
-        }
-
-        var fontSize = ""
-        var roundedValue = 1
-
-		if slider.value < 0.65 {
-            roundedValue = 0
-            fontSize = "fontemenor"
-        }
-        if slider.value > 1.4 {
-            roundedValue = 2
-            fontSize = "fontemaior"
-        }
-        slider.value = Float(roundedValue)
-
-        UserDefaults.standard.set(fontSize, forKey: Definitions.fontSize)
-        UserDefaults.standard.synchronize()
-
-		applyTheme()
-    }
-
-    @IBAction private func changeDarkMode(_ sender: Any) {
-        guard let darkModeSwitch = sender as? UISwitch else {
-            return
-        }
-
-        UserDefaults.standard.set(darkModeSwitch.isOn, forKey: Definitions.darkMode)
-        UserDefaults.standard.synchronize()
-
-        applyTheme()
 	}
 
 	@IBAction private func setPushMode(_ sender: Any) {
@@ -137,82 +139,11 @@ class SettingsTableViewController: UITableViewController {
 
 	// MARK: - Private Methods -
 
-    fileprivate func applyTheme() {
-        Settings().theme.apply(for: UIApplication.shared)
-
-		darkMode.isOn = Settings().isDarkMode
-		NotificationCenter.default.post(name: .reloadWeb, object: nil)
-        tableView.backgroundColor = Settings().theme.backgroundColor
+    fileprivate func getAppVersion() -> String {
+        let bundle = Bundle(for: type(of: self))
+        let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String
+        return "\(appVersion ?? "0")"
     }
-
-}
-
-// MARK: - App Icon Methods -
-
-extension SettingsTableViewController {
-
-	struct IconOptions {
-		static let option1 = "option_1"
-		static let option2 = "option_2"
-        static let option3 = "option_3"
-        static let type = Settings().isPhone ? "phone" : "tablet"
-        static let icon1 = "\(type)_1"
-        static let icon2 = "\(type)_2"
-        static let icon3 = "\(type)_3"
-
-		func getIcon(for option: String) -> String? {
-			var icon: String?
-
-			switch option {
-			case IconOptions.option1:
-				icon = IconOptions.icon1
-			case IconOptions.option2:
-				icon = IconOptions.icon2
-            case IconOptions.option3:
-                icon = IconOptions.icon3
-			default:
-				break
-			}
-
-			return icon
-		}
-	}
-
-	@IBAction private func changeAppIcon(_ sender: Any) {
-		guard let button = sender as? UIButton,
-			let option = button.restorationIdentifier else {
-				return
-		}
-		changeIcon(to: option)
-	}
-
-	fileprivate func changeIcon(to iconName: String) {
-		guard UIApplication.shared.supportsAlternateIcons,
-			let icon = IconOptions().getIcon(for: iconName) else {
-				return
-		}
-
-		// Temporary change the colors
-		if let isDarkMode = UserDefaults.standard.object(forKey: "darkMode") as? Bool, isDarkMode {
-			UIApplication.shared.keyWindow?.tintColor = LightTheme().tint
-		}
-
-		UIApplication.shared.setAlternateIconName(icon) { error in
-			if error == nil {
-				// Return to theme settings
-				DispatchQueue.main.async {
-					self.applyTheme()
-				}
-
-				UserDefaults.standard.set(iconName, forKey: Definitions.icon)
-				UserDefaults.standard.synchronize()
-
-				self.iconOption1.alpha = iconName == IconOptions.option1 ? 1 : 0.6
-				self.iconOption2.alpha = iconName == IconOptions.option2 ? 1 : 0.6
-                self.iconOption3.alpha = iconName == IconOptions.option3 ? 1 : 0.6
-			}
-		}
-	}
 
 }
 
@@ -223,7 +154,7 @@ extension SettingsTableViewController: MFMailComposeViewControllerDelegate {
 	@IBAction private func reportProblem(_ sender: Any) {
 		let composeVC = MFMailComposeViewController()
 		composeVC.mailComposeDelegate = self
-		composeVC.setSubject("Relato de problema no app MacMagazine \(version)")
+		composeVC.setSubject("Relato de problema no app MacMagazine \(getAppVersion())")
 		composeVC.setToRecipients(["contato@macmagazine.com.br"])
 
 		// Temporary change the colors
@@ -238,10 +169,183 @@ extension SettingsTableViewController: MFMailComposeViewControllerDelegate {
 		}
 	}
 
-	fileprivate func getAppVersion() -> String {
-		let bundle = Bundle(for: type(of: self))
-		let appVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String
-		return "\(appVersion ?? "0")"
-	}
+}
 
+// MARK: - Appearance Methods -
+
+extension SettingsTableViewController {
+
+    @IBAction private func changeFontSize(_ sender: Any) {
+        guard let slider = sender as? UISlider else {
+            return
+        }
+
+        var fontSize = ""
+        var roundedValue = 1
+
+        if slider.value < 0.65 {
+            roundedValue = 0
+            fontSize = "fontemenor"
+        }
+        if slider.value > 1.4 {
+            roundedValue = 2
+            fontSize = "fontemaior"
+        }
+        slider.value = Float(roundedValue)
+
+        UserDefaults.standard.set(fontSize, forKey: Definitions.fontSize)
+        UserDefaults.standard.synchronize()
+
+        applyTheme()
+    }
+
+    @IBAction private func changeAppearanceFollowSystem(_ sender: Any) {
+        guard let followSystem = sender as? UISwitch else {
+            return
+        }
+        UserDefaults.standard.set(followSystem.isOn ? Appearance.native.rawValue : darkModeSegmentControl.selectedSegmentIndex, forKey: Definitions.darkMode)
+        UserDefaults.standard.synchronize()
+
+		if #available(iOS 13.0, *) {
+			if followSystem.isOn {
+				let application = UIApplication.shared
+				application.keyWindow?.overrideUserInterfaceStyle = .unspecified
+
+				DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+					application.keyWindow?.overrideUserInterfaceStyle = application.keyWindow?.rootViewController?.traitCollection.userInterfaceStyle ?? .light
+
+					self.applyTheme()
+					self.setupAppearanceSettings()
+				}
+			}
+		}
+
+        applyTheme()
+        setupAppearanceSettings()
+    }
+
+    @IBAction private func changeDarkMode(_ sender: Any) {
+        guard let darkMode = sender as? UISegmentedControl else {
+            return
+        }
+        UserDefaults.standard.set(darkMode.selectedSegmentIndex, forKey: Definitions.darkMode)
+        UserDefaults.standard.synchronize()
+
+        applyTheme()
+    }
+
+    // MARK: - Private Methods -
+
+    fileprivate func setupAppearanceSettings() {
+        appearanceCell1.isUserInteractionEnabled = Settings().supportsNativeDarkMode
+        darkModeSystem.isOn = Settings().supportsNativeDarkMode && Settings().appearance == .native
+        if !appearanceCell1.isUserInteractionEnabled {
+            appearanceCell1.subviews[0].subviews.forEach {
+                if let view = $0 as? UILabel {
+                    view.isEnabled = false
+                }
+                if let view = $0 as? UISwitch {
+                    view.isEnabled = false
+                }
+            }
+        }
+		appearanceCell1.isHidden = !appearanceCell1.isUserInteractionEnabled
+
+        appearanceCell2.isUserInteractionEnabled = !darkModeSystem.isOn
+        darkModeSegmentControl.selectedSegmentIndex = Settings().isDarkMode ? 1 : 0
+        appearanceCell2.subviews[0].subviews.forEach {
+            if let view = $0 as? UISegmentedControl {
+                view.isEnabled = appearanceCell2.isUserInteractionEnabled
+            }
+        }
+		appearanceCell2.isHidden = !appearanceCell2.isUserInteractionEnabled
+
+		tableView.reloadData()
+    }
+
+    fileprivate func applyTheme() {
+        Settings().applyTheme()
+        tableView.backgroundColor = Settings().theme.backgroundColor
+    }
+
+}
+
+// MARK: - App Icon Methods -
+
+extension SettingsTableViewController {
+
+    struct IconOptions {
+        static let option1 = "option_1"
+        static let option2 = "option_2"
+        static let option3 = "option_3"
+        static let type = Settings().isPhone ? "phone" : "tablet"
+        static let icon1 = "\(type)_1"
+        static let icon2 = "\(type)_2"
+        static let icon3 = "\(type)_3"
+
+        func getIcon(for option: String) -> String? {
+            var icon: String?
+
+            switch option {
+            case IconOptions.option1:
+                icon = IconOptions.icon1
+            case IconOptions.option2:
+                icon = IconOptions.icon2
+            case IconOptions.option3:
+                icon = IconOptions.icon3
+            default:
+                break
+            }
+
+            return icon
+        }
+    }
+
+    @IBAction private func changeAppIcon(_ sender: Any) {
+        guard let button = sender as? UIButton,
+            let option = button.restorationIdentifier else {
+                return
+        }
+        changeIcon(to: option)
+    }
+
+    fileprivate func changeIcon(to iconName: String) {
+        guard UIApplication.shared.supportsAlternateIcons,
+            let icon = IconOptions().getIcon(for: iconName) else {
+                return
+        }
+
+        // Temporary change the colors
+        if Settings().appearance != .native &&
+            Settings().isDarkMode {
+            UIApplication.shared.keyWindow?.tintColor = LightTheme().tint
+        }
+
+        UIApplication.shared.setAlternateIconName(icon) { error in
+            if error == nil {
+                // Return to theme settings
+                DispatchQueue.main.async {
+                    self.applyTheme()
+                }
+
+                UserDefaults.standard.set(iconName, forKey: Definitions.icon)
+                UserDefaults.standard.synchronize()
+
+                self.iconOption1.alpha = iconName == IconOptions.option1 ? 1 : 0.6
+                self.iconOption2.alpha = iconName == IconOptions.option2 ? 1 : 0.6
+                self.iconOption3.alpha = iconName == IconOptions.option3 ? 1 : 0.6
+            }
+        }
+    }
+
+}
+
+// MARK: - Notifications -
+
+extension SettingsTableViewController {
+    @objc func onRefreshAfterBackground(_ notification: Notification) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+			self.tableView.backgroundColor = Settings().theme.backgroundColor
+        }
+    }
 }

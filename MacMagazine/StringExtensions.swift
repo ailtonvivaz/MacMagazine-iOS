@@ -28,14 +28,22 @@ extension String {
         return dateFormatter.date(from: self) ?? Date()
     }
 
+    fileprivate func currentCalendar() -> Calendar {
+        var calendar = Calendar.current
+        if let timeZone = TimeZone(identifier: "America/Sao_Paulo") {
+            calendar.timeZone = timeZone
+        }
+        return calendar
+    }
+
 	func toHeaderDate() -> String {
 		// Expected date format: "20190227"
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateFormat = "yyyyMMdd"
-		dateFormatter.timeZone = TimeZone(abbreviation: "BRT")
+		dateFormatter.timeZone = TimeZone(identifier: "America/Sao_Paulo")
 		let date = dateFormatter.date(from: self) ?? Date()
 
-		let calendar = Calendar.current
+		let calendar = currentCalendar()
 		if calendar.isDateInToday(date) {
 			return "HOJE"
 		}
@@ -50,10 +58,7 @@ extension String {
 	func toComplicationDate() -> String {
 		let dateToUse = self.toDate()
 
-		var calendar = Calendar.current
-		if let timeZone = TimeZone(identifier: "America/Sao_Paulo") {
-			calendar.timeZone = timeZone
-		}
+        let calendar = currentCalendar()
 		let day = String(format: "%02d", calendar.component(.day, from: dateToUse))
 		let month = String(format: "%02d", calendar.component(.month, from: dateToUse))
 		let hour = String(format: "%02d", calendar.component(.hour, from: dateToUse))
@@ -81,6 +86,31 @@ extension String {
 			], documentAttributes: nil).string
 
 		return decoded ?? self
+	}
+
+	func toSubHeaderDate() -> String {
+		// Expected date format: "PT4M13S"
+		// PT = fixed
+		// 4M = 4 minutes
+		// 13S = 13 seconds
+		let formattedDuration = self
+			.replacingOccurrences(of: "PT", with: "")
+			.replacingOccurrences(of: "H", with: ":")
+			.replacingOccurrences(of: "M", with: ":")
+			.replacingOccurrences(of: "S", with: "")
+
+        let components = formattedDuration.components(separatedBy: ":")
+        var duration = ""
+        for component in components {
+            duration = duration.isEmpty ? duration : duration + ":"
+            if component.count < 2 {
+                duration += "0" + component
+                continue
+            }
+            duration += component
+        }
+
+        return duration
 	}
 
 }

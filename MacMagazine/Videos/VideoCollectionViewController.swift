@@ -60,6 +60,7 @@ class VideoCollectionViewController: UICollectionViewController {
         // Do any additional setup after loading the view.
 		navigationItem.titleView = logoView
 		navigationItem.title = nil
+        self.extendedLayoutIncludesOpaqueBars = true
 
 		searchController = UISearchController(searchResultsController: nil)
 		searchController?.searchBar.autocapitalizationType = .none
@@ -121,15 +122,22 @@ class VideoCollectionViewController: UICollectionViewController {
 			}
 			API().getVideosStatistics(videoIds) { statistics in
 				guard let stats = statistics?.items else {
+					self.endGetVideos()
 					return
 				}
 				DispatchQueue.main.async {
-					self.isLoading = false
 					CoreDataStack.shared.save(playlist: videos, statistics: stats)
-					self.collectionView.reloadData()
-					self.navigationItem.titleView = self.logoView
+					self.endGetVideos()
 				}
 			}
+		}
+	}
+
+	fileprivate func endGetVideos() {
+		DispatchQueue.main.async {
+			self.isLoading = false
+			self.collectionView.reloadData()
+			self.navigationItem.titleView = self.logoView
 		}
 	}
 
@@ -186,10 +194,13 @@ class VideoCollectionViewController: UICollectionViewController {
 	// MARK: - Actions methods -
 
 	@IBAction private func search(_ sender: Any) {
-		navigationItem.searchController = searchController
-		searchController?.searchBar.becomeFirstResponder()
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = false
 
-		Settings().applyTheme()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            self.searchController?.searchBar.becomeFirstResponder()
+            Settings().applyTheme()
+        }
 	}
 
 	@IBAction private func showFavorites(_ sender: Any) {
@@ -229,7 +240,9 @@ extension VideoCollectionViewController {
 		lastContentOffset = offset
 
 		// Pull to Refresh
-		if offset.y < -100 && navigationItem.titleView == logoView {
+		if offset.y < -100 &&
+            navigationItem.titleView == logoView &&
+            navigationItem.searchController == nil {
 			pageToken = ""
 			getVideos()
 		}
