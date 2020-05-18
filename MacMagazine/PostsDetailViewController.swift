@@ -38,11 +38,6 @@ class PostsDetailViewController: UIPageViewController, UIPageViewControllerDataS
 		setViewControllers([controller], direction: .forward, animated: true, completion: nil)
 	}
 
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
-	}
-
 	// MARK: - PageViewController -
 
 	func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {

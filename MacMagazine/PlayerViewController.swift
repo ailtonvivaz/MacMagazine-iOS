@@ -27,13 +27,13 @@ class PlayerViewController: UIViewController {
 
     var podcast: Podcast? {
         didSet {
+            scPlayer.soundEffect = nil
+
 			if podcast?.frame == frame {
 				if isHidden {
-					UIApplication.shared.isIdleTimerDisabled = true
 					show?(true)
 					scPlayer?.play()
 				} else {
-					UIApplication.shared.isIdleTimerDisabled = false
 					show?(false)
 					scPlayer?.pause()
 				}
@@ -47,13 +47,6 @@ class PlayerViewController: UIViewController {
 				loadPlayer()
 			}
         }
-    }
-
-    // MARK: - View lifecycle -
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
     }
 
     // MARK: - Methods -

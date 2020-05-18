@@ -105,6 +105,17 @@ struct Settings {
 		return isDarkMode ? DarkTheme() : LightTheme()
 	}
 
+	func changeTheme(based previousTraitCollection: UITraitCollection?) {
+		if #available(iOS 13.0, *) {
+			if let style = previousTraitCollection?.userInterfaceStyle,
+				appearance == .native &&
+					((style == .dark && isDarkMode) ||
+					(style == .light && !isDarkMode)) {
+				applyTheme()
+			}
+		}
+	}
+
 	// MARK: - Review -
 
 	var shouldAskForReview: Bool {

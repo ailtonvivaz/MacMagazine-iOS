@@ -8,24 +8,20 @@
 
 import Foundation
 
-enum Format {
+enum Format: CaseIterable {
 	static let wordpress = "EEE, dd MMM yyyy HH:mm:ss +0000"
-	static let youtube = "yyyy-MM-dd'T'HH:mm:ss.000'Z'"
+    static let youtube = "yyyy-MM-dd'T'HH:mm:ss'Z'"
 }
 
 extension String {
 
-	func toDate() -> Date {
-		return toDate(nil)
-	}
-
-	func toDate(_ format: String?) -> Date {
+	func toDate(_ format: String? = nil) -> Date {
         // Expected date format: "Tue, 26 Feb 2019 23:00:53 +0000"
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US")
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
         dateFormatter.dateFormat = format ?? Format.wordpress
-		dateFormatter.locale = Locale(identifier: "en_US")
-		dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
-        return dateFormatter.date(from: self) ?? Date()
+        return dateFormatter.date(from: self.replacingOccurrences(of: ".000", with: "")) ?? Date()
     }
 
     fileprivate func currentCalendar() -> Calendar {
@@ -102,12 +98,9 @@ extension String {
         let components = formattedDuration.components(separatedBy: ":")
         var duration = ""
         for component in components {
+            let value = Int(component) ?? 0
             duration = duration.isEmpty ? duration : duration + ":"
-            if component.count < 2 {
-                duration += "0" + component
-                continue
-            }
-            duration += component
+            duration += String(format: "%02d", value)
         }
 
         return duration

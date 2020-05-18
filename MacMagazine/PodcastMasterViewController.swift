@@ -64,11 +64,6 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
 		}
 	}
 
-	override func didReceiveMemoryWarning() {
-		super.didReceiveMemoryWarning()
-		// Dispose of any resources that can be recreated.
-	}
-
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         userActivity?.invalidate()
@@ -77,8 +72,11 @@ class PodcastMasterViewController: UITableViewController, FetchedResultsControll
     // MARK: - Scroll detection -
 
 	@objc func onScrollToTop(_ notification: Notification) {
-		tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .bottom)
-		tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
+        if tableView.numberOfSections > 0 &&
+            tableView.numberOfRows(inSection: 0) > 0 {
+            tableView.selectRow(at: IndexPath(row: 0, section: 0), animated: true, scrollPosition: .bottom)
+            tableView.deselectRow(at: IndexPath(row: 0, section: 0), animated: false)
+        }
 	}
 
 	override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
