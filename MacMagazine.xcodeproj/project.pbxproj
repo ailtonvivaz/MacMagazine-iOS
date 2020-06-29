@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5EE31F1124AA884600B08105 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EE31F1024AA884600B08105 /* WidgetKit.framework */; };
+		5EE31F1324AA884600B08105 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EE31F1224AA884600B08105 /* SwiftUI.framework */; };
+		5EE31F1624AA884600B08105 /* MacMagazineWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE31F1524AA884600B08105 /* MacMagazineWidgetExtension.swift */; };
+		5EE31F1924AA884700B08105 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EE31F1824AA884700B08105 /* Assets.xcassets */; };
+		5EE31F1B24AA884700B08105 /* MacMagazineWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 5EE31F1724AA884600B08105 /* MacMagazineWidgetExtension.intentdefinition */; };
+		5EE31F1C24AA884700B08105 /* MacMagazineWidgetExtension.intentdefinition in Sources */ = {isa = PBXBuildFile; fileRef = 5EE31F1724AA884600B08105 /* MacMagazineWidgetExtension.intentdefinition */; };
+		5EE31F1F24AA884700B08105 /* MacMagazineWidgetExtensionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5EE31F0F24AA884600B08105 /* MacMagazineWidgetExtensionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9B02AE4A1F5C507000EA1A6F /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B02AE491F5C507000EA1A6F /* Network.swift */; };
 		9B0B0AB6224693FC00C8C90C /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B0AB5224693FC00C8C90C /* CoreDataStack.swift */; };
 		9B0DD44A2226BAF60016C567 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0DD4492226BAF60016C567 /* API.swift */; };
@@ -125,6 +132,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5EE31F1D24AA884700B08105 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9BCAD66F1F47A08100B54526 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5EE31F0E24AA884600B08105;
+			remoteInfo = MacMagazineWidgetExtensionExtension;
+		};
 		9B9C7F9E226BF836000534CA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9BCAD66F1F47A08100B54526 /* Project object */;
@@ -162,6 +176,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				5EE31F1F24AA884700B08105 /* MacMagazineWidgetExtensionExtension.appex in Embed App Extensions */,
 				9B9C7FA0226BF836000534CA /* MacMagazineNotificationServiceExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -202,6 +217,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5EE31F0F24AA884600B08105 /* MacMagazineWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacMagazineWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EE31F1024AA884600B08105 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		5EE31F1224AA884600B08105 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		5EE31F1524AA884600B08105 /* MacMagazineWidgetExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacMagazineWidgetExtension.swift; sourceTree = "<group>"; };
+		5EE31F1724AA884600B08105 /* MacMagazineWidgetExtension.intentdefinition */ = {isa = PBXFileReference; lastKnownFileType = file.intentdefinition; path = MacMagazineWidgetExtension.intentdefinition; sourceTree = "<group>"; };
+		5EE31F1824AA884700B08105 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5EE31F1A24AA884700B08105 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5EE31F2324AA884F00B08105 /* MacMagazineWidgetExtensionExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MacMagazineWidgetExtensionExtension.entitlements; sourceTree = "<group>"; };
 		9B02677F2387581300446C95 /* macmagazine 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "macmagazine 6.xcdatamodel"; sourceTree = "<group>"; };
 		9B02AE491F5C507000EA1A6F /* Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		9B0B0AB5224693FC00C8C90C /* CoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
@@ -323,6 +346,15 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5EE31F0C24AA884600B08105 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EE31F1324AA884600B08105 /* SwiftUI.framework in Frameworks */,
+				5EE31F1124AA884600B08105 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B9C7F96226BF835000534CA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -368,6 +400,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5EE31F1424AA884600B08105 /* MacMagazineWidgetExtension */ = {
+			isa = PBXGroup;
+			children = (
+				5EE31F2324AA884F00B08105 /* MacMagazineWidgetExtensionExtension.entitlements */,
+				5EE31F1524AA884600B08105 /* MacMagazineWidgetExtension.swift */,
+				5EE31F1724AA884600B08105 /* MacMagazineWidgetExtension.intentdefinition */,
+				5EE31F1824AA884700B08105 /* Assets.xcassets */,
+				5EE31F1A24AA884700B08105 /* Info.plist */,
+			);
+			path = MacMagazineWidgetExtension;
+			sourceTree = "<group>";
+		};
 		9B02AE4D1F5C515A00EA1A6F /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -546,6 +590,7 @@
 				9BB4BC4E225B99F500559170 /* MacMagazineWatch */,
 				9BB4BC5D225B99F600559170 /* MacMagazineWatch Extension */,
 				9B9C7F9A226BF836000534CA /* MacMagazineNotificationServiceExtension */,
+				5EE31F1424AA884600B08105 /* MacMagazineWidgetExtension */,
 				9BCAD6781F47A08100B54526 /* Products */,
 				9BF96565225E371900BAF22D /* Frameworks */,
 			);
@@ -559,6 +604,7 @@
 				9BB4BC4D225B99F500559170 /* MacMagazineWatch.app */,
 				9BB4BC59225B99F600559170 /* MacMagazineWatch Extension.appex */,
 				9B9C7F99226BF835000534CA /* MacMagazineNotificationServiceExtension.appex */,
+				5EE31F0F24AA884600B08105 /* MacMagazineWidgetExtensionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -703,6 +749,8 @@
 			children = (
 				9BBFD57D2284AF06005E6897 /* CoreTelephony.framework */,
 				9B9C7F8F226B6111000534CA /* WebKit.framework */,
+				5EE31F1024AA884600B08105 /* WidgetKit.framework */,
+				5EE31F1224AA884600B08105 /* SwiftUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -737,6 +785,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5EE31F0E24AA884600B08105 /* MacMagazineWidgetExtensionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5EE31F2224AA884700B08105 /* Build configuration list for PBXNativeTarget "MacMagazineWidgetExtensionExtension" */;
+			buildPhases = (
+				5EE31F0B24AA884600B08105 /* Sources */,
+				5EE31F0C24AA884600B08105 /* Frameworks */,
+				5EE31F0D24AA884600B08105 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MacMagazineWidgetExtensionExtension;
+			productName = MacMagazineWidgetExtensionExtension;
+			productReference = 5EE31F0F24AA884600B08105 /* MacMagazineWidgetExtensionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		9B9C7F98226BF835000534CA /* MacMagazineNotificationServiceExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9B9C7FA1226BF836000534CA /* Build configuration list for PBXNativeTarget "MacMagazineNotificationServiceExtension" */;
@@ -810,6 +875,7 @@
 			dependencies = (
 				9B9C7F9F226BF836000534CA /* PBXTargetDependency */,
 				9BB4BC68225B99F700559170 /* PBXTargetDependency */,
+				5EE31F1E24AA884700B08105 /* PBXTargetDependency */,
 			);
 			name = MacMagazine;
 			productName = MacMagazine;
@@ -840,10 +906,13 @@
 		9BCAD66F1F47A08100B54526 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1020;
+				LastSwiftUpdateCheck = 1200;
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = MacMagazine;
 				TargetAttributes = {
+					5EE31F0E24AA884600B08105 = {
+						CreatedOnToolsVersion = 12.0;
+					};
 					9B9C7F98226BF835000534CA = {
 						CreatedOnToolsVersion = 10.2.1;
 						DevelopmentTeam = 7PXVC8PJ97;
@@ -908,11 +977,20 @@
 				9BB4BC4C225B99F500559170 /* MacMagazineWatch */,
 				9BB4BC58225B99F600559170 /* MacMagazineWatch Extension */,
 				9B9C7F98226BF835000534CA /* MacMagazineNotificationServiceExtension */,
+				5EE31F0E24AA884600B08105 /* MacMagazineWidgetExtensionExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5EE31F0D24AA884600B08105 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EE31F1924AA884700B08105 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B9C7F97226BF835000534CA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1086,6 +1164,15 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5EE31F0B24AA884600B08105 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5EE31F1B24AA884700B08105 /* MacMagazineWidgetExtension.intentdefinition in Sources */,
+				5EE31F1624AA884600B08105 /* MacMagazineWidgetExtension.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9B9C7F95226BF835000534CA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1155,6 +1242,7 @@
 				9B420B0823912D55005A2084 /* SFSafariViewControllerExtensions.swift in Sources */,
 				9BD135FE2228089900A0B627 /* UISplitViewControllerExtension.swift in Sources */,
 				9BF356281F6208F70081BE90 /* UIColorExtensions.swift in Sources */,
+				5EE31F1C24AA884700B08105 /* MacMagazineWidgetExtension.intentdefinition in Sources */,
 				9B25F50D2260A46D0057FBF9 /* VideoCollectionViewController.swift in Sources */,
 				9B9C7F92226B6142000534CA /* SoundcloudPlayer.swift in Sources */,
 				9B6D0B842229B72100E2C044 /* macmagazine.xcdatamodeld in Sources */,
@@ -1188,6 +1276,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5EE31F1E24AA884700B08105 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5EE31F0E24AA884600B08105 /* MacMagazineWidgetExtensionExtension */;
+			targetProxy = 5EE31F1D24AA884700B08105 /* PBXContainerItemProxy */;
+		};
 		9B9C7F9F226BF836000534CA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 9B9C7F98226BF835000534CA /* MacMagazineNotificationServiceExtension */;
@@ -1302,6 +1395,63 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		5EE31F2024AA884700B08105 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MacMagazineWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7PXVC8PJ97;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = MacMagazineWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brit.macmagazine.MacMagazineWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5EE31F2124AA884700B08105 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = MacMagazineWidgetExtensionExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 7PXVC8PJ97;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = MacMagazineWidgetExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.brit.macmagazine.MacMagazineWidgetExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		9B9C7FA2226BF836000534CA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1753,6 +1903,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5EE31F2224AA884700B08105 /* Build configuration list for PBXNativeTarget "MacMagazineWidgetExtensionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EE31F2024AA884700B08105 /* Debug */,
+				5EE31F2124AA884700B08105 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9B9C7FA1226BF836000534CA /* Build configuration list for PBXNativeTarget "MacMagazineNotificationServiceExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
