@@ -69,7 +69,7 @@ class API {
     var onCompletion: ((XMLPost?) -> Void)?
 	var isComplication = false
 
-	#if os(iOS)
+	#if APP && os(iOS)
 	var onVideoCompletion: ((YouTube<String>?) -> Void)?
 	var onVideoSearchCompletion: ((YouTube<ResourceId>?) -> Void)?
 	#endif
@@ -143,11 +143,11 @@ class API {
             return
         }
 
-        #if os(iOS)
+        #if APP && os(iOS)
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         #endif
         Network.get(url: url) { (data: Data?, _: String?) in
-            #if os(iOS)
+            #if APP && os(iOS)
             DispatchQueue.main.async {
                 UIApplication.shared.isNetworkActivityIndicatorVisible = false
             }
@@ -185,11 +185,11 @@ class API {
             return
         }
 
-		#if os(iOS)
+		#if APP && os(iOS)
 		UIApplication.shared.isNetworkActivityIndicatorVisible = true
 		#endif
         Network.get(url: url) { (data: Data?, _: String?) in
-			#if os(iOS)
+			#if APP && os(iOS)
 			DispatchQueue.main.async {
 				UIApplication.shared.isNetworkActivityIndicatorVisible = false
 			}
