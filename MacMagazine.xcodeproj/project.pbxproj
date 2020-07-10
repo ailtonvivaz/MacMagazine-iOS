@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E05A44824B544870087A6BA /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0DD4492226BAF60016C567 /* API.swift */; };
+		5E05A44924B544950087A6BA /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B0DD44E2226FD150016C567 /* StringExtensions.swift */; };
+		5E05A44A24B5449E0087A6BA /* APIXMLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB2CA682264883A0012ACD6 /* APIXMLParser.swift */; };
+		5E05A44B24B544B20087A6BA /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B02AE491F5C507000EA1A6F /* Network.swift */; };
+		5E05A44D24B54A750087A6BA /* Kingfisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BF96571225E3ACD00BAF22D /* Kingfisher.framework */; };
+		5E05A45124B54AC10087A6BA /* PostsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E05A45024B54AC10087A6BA /* PostsProvider.swift */; };
+		5E05A45324B54B420087A6BA /* PostsEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E05A45224B54B420087A6BA /* PostsEntry.swift */; };
+		5E05A45524B54B750087A6BA /* WigetPostsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E05A45424B54B750087A6BA /* WigetPostsView.swift */; };
+		5E05A45724B54CCF0087A6BA /* ImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E05A45624B54CCF0087A6BA /* ImageLoader.swift */; };
+		5E05A45924B54D0F0087A6BA /* AsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E05A45824B54D0F0087A6BA /* AsyncImage.swift */; };
 		5EE31F1124AA884600B08105 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EE31F1024AA884600B08105 /* WidgetKit.framework */; };
 		5EE31F1324AA884600B08105 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5EE31F1224AA884600B08105 /* SwiftUI.framework */; };
 		5EE31F1624AA884600B08105 /* MacMagazineWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EE31F1524AA884600B08105 /* MacMagazineWidgetExtension.swift */; };
@@ -217,6 +227,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5E05A45024B54AC10087A6BA /* PostsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostsProvider.swift; sourceTree = "<group>"; };
+		5E05A45224B54B420087A6BA /* PostsEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostsEntry.swift; sourceTree = "<group>"; };
+		5E05A45424B54B750087A6BA /* WigetPostsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WigetPostsView.swift; sourceTree = "<group>"; };
+		5E05A45624B54CCF0087A6BA /* ImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoader.swift; sourceTree = "<group>"; };
+		5E05A45824B54D0F0087A6BA /* AsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncImage.swift; sourceTree = "<group>"; };
 		5EE31F0F24AA884600B08105 /* MacMagazineWidgetExtensionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MacMagazineWidgetExtensionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EE31F1024AA884600B08105 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		5EE31F1224AA884600B08105 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -351,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5EE31F1324AA884600B08105 /* SwiftUI.framework in Frameworks */,
+				5E05A44D24B54A750087A6BA /* Kingfisher.framework in Frameworks */,
 				5EE31F1124AA884600B08105 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -400,9 +416,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5E05A44E24B54A900087A6BA /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5E05A45024B54AC10087A6BA /* PostsProvider.swift */,
+				5E05A45224B54B420087A6BA /* PostsEntry.swift */,
+				5E05A45624B54CCF0087A6BA /* ImageLoader.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		5E05A44F24B54A950087A6BA /* View */ = {
+			isa = PBXGroup;
+			children = (
+				5E05A45424B54B750087A6BA /* WigetPostsView.swift */,
+				5E05A45824B54D0F0087A6BA /* AsyncImage.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		5EE31F1424AA884600B08105 /* MacMagazineWidgetExtension */ = {
 			isa = PBXGroup;
 			children = (
+				5E05A44F24B54A950087A6BA /* View */,
+				5E05A44E24B54A900087A6BA /* Model */,
 				5EE31F2324AA884F00B08105 /* MacMagazineWidgetExtensionExtension.entitlements */,
 				5EE31F1524AA884600B08105 /* MacMagazineWidgetExtension.swift */,
 				5EE31F1724AA884600B08105 /* MacMagazineWidgetExtension.intentdefinition */,
@@ -1168,7 +1205,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5E05A44924B544950087A6BA /* StringExtensions.swift in Sources */,
+				5E05A44A24B5449E0087A6BA /* APIXMLParser.swift in Sources */,
+				5E05A45724B54CCF0087A6BA /* ImageLoader.swift in Sources */,
+				5E05A44B24B544B20087A6BA /* Network.swift in Sources */,
 				5EE31F1B24AA884700B08105 /* MacMagazineWidgetExtension.intentdefinition in Sources */,
+				5E05A45924B54D0F0087A6BA /* AsyncImage.swift in Sources */,
+				5E05A45124B54AC10087A6BA /* PostsProvider.swift in Sources */,
+				5E05A44824B544870087A6BA /* API.swift in Sources */,
+				5E05A45324B54B420087A6BA /* PostsEntry.swift in Sources */,
+				5E05A45524B54B750087A6BA /* WigetPostsView.swift in Sources */,
 				5EE31F1624AA884600B08105 /* MacMagazineWidgetExtension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1406,6 +1452,10 @@
 				CODE_SIGN_ENTITLEMENTS = MacMagazineWidgetExtensionExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7PXVC8PJ97;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = MacMagazineWidgetExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -1436,6 +1486,10 @@
 				CODE_SIGN_ENTITLEMENTS = MacMagazineWidgetExtensionExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7PXVC8PJ97;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Frameworks/iOS",
+				);
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = MacMagazineWidgetExtension/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
