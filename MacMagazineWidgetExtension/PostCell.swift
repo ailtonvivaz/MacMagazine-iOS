@@ -65,13 +65,16 @@ struct PostCell: View {
     }
 
     var body: some View {
-        if let link = post.link, let url = URL(string: link) {
-            Link(destination: url) {
+        Group {
+            if let link = post.link, let url = URL(string: link) {
+                Link(destination: url) {
+                    cell
+                }
+            } else {
                 cell
             }
-        } else {
-            cell
         }
+        .cornerRadius(16)
     }
 
     var coverStyle: some View {
@@ -112,6 +115,8 @@ struct PostCell: View {
                 contentView
             }
         }
+        .padding(8)
+        .background(Color(.systemBackground))
     }
 }
 

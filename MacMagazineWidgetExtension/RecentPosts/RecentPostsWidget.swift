@@ -16,34 +16,37 @@ struct RecentPostsWidget: View {
     var content: [PostData] { entry.posts }
 
     var body: some View {
-        if content.isEmpty {
-            Text("Nenhum conteúdo")
-                .font(.headline)
-                .padding()
-        } else {
-            switch widgetFamily {
-            case .systemSmall:
-                PostCell(post: content[0], style: .cover)
-            case .systemMedium:
-                VStack {
-                    PostCell(post: content[0], style: .row)
-                    PostCell(post: content[1], style: .row)
-                }.padding()
-            case .systemLarge:
-                GeometryReader { geo in
-                    VStack(spacing: 0) {
-                        PostCell(post: content[0], style: .cover)
-                            .frame(height: 0.45 * geo.size.height)
-                        VStack {
-                            PostCell(post: content[1], style: .row)
-                            PostCell(post: content[2], style: .row)
-                        }.padding()
+        Group {
+            if content.isEmpty {
+                Text("Nenhum conteúdo")
+                    .font(.headline)
+                    .padding()
+            } else {
+                switch widgetFamily {
+                case .systemSmall:
+                    PostCell(post: content[0], style: .cover)
+                case .systemMedium:
+                    VStack {
+                        PostCell(post: content[0], style: .row)
+                        PostCell(post: content[1], style: .row)
+                    }.padding(8)
+                case .systemLarge:
+                    GeometryReader { geo in
+                        VStack(spacing: 0) {
+                            PostCell(post: content[0], style: .cover)
+                                .frame(height: 0.45 * geo.size.height)
+                                .padding([.top, .horizontal], 8)
+                            VStack {
+                                PostCell(post: content[1], style: .row)
+                                PostCell(post: content[2], style: .row)
+                            }.padding(8)
+                        }
                     }
+                @unknown default:
+                    Text("other size")
                 }
-            @unknown default:
-                Text("other size")
             }
-        }
+        }.background(Color(.secondarySystemBackground))
     }
 }
 
