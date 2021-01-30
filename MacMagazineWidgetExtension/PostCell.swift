@@ -53,14 +53,6 @@ struct PostCell: View {
                     Spacer(minLength: 0)
                 }
             }
-            if let pubDate = post.pubDate {
-                HStack {
-                    Spacer()
-                    Text(pubDate.toComplicationDate())
-                        .font(.caption2)
-                        .foregroundColor(.gray)
-                }
-            }
         }
     }
 
@@ -74,24 +66,13 @@ struct PostCell: View {
                 cell
             }
         }
-        .cornerRadius(16)
     }
 
     var coverStyle: some View {
         VStack {
-            HStack {
-                Spacer()
-                Image("logo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 30)
-                    .unredacted()
-            }
-            .shadow(color: Color.black.opacity(0.2), radius: 1)
-            .padding([.top, .trailing])
             Spacer(minLength: 0)
             contentView.shadow(color: .black, radius: 5)
-            .padding([.horizontal, .bottom])
+            .padding()
         }
         .background(
             LinearGradient(gradient: Gradient(colors: [Color.black.opacity(0.01), Color.black]), startPoint: .top, endPoint: .bottom))
@@ -115,8 +96,6 @@ struct PostCell: View {
                 contentView
             }
         }
-        .padding(8)
-        .background(Color(.systemBackground))
     }
 }
 

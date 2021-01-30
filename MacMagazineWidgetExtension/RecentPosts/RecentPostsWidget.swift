@@ -26,21 +26,15 @@ struct RecentPostsWidget: View {
                 case .systemSmall:
                     PostCell(post: content[0], style: .cover)
                 case .systemMedium:
-                    VStack {
-                        PostCell(post: content[0], style: .row)
-                        PostCell(post: content[1], style: .row)
-                    }.padding(8)
+                    VStack(spacing: 0) {
+                        PostCell(post: content[0], style: .cover)
+                        PostCell(post: content[1], style: .cover)
+                    }
                 case .systemLarge:
-                    GeometryReader { geo in
-                        VStack(spacing: 0) {
-                            PostCell(post: content[0], style: .cover)
-                                .frame(height: 0.45 * geo.size.height)
-                                .padding([.top, .horizontal], 8)
-                            VStack {
-                                PostCell(post: content[1], style: .row)
-                                PostCell(post: content[2], style: .row)
-                            }.padding(8)
-                        }
+                    VStack(spacing: 0) {
+                        PostCell(post: content[0], style: .cover)
+                        PostCell(post: content[1], style: .cover)
+                        PostCell(post: content[2], style: .cover)
                     }
                 @unknown default:
                     Text("other size")
