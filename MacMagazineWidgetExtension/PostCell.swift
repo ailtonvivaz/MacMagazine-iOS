@@ -58,7 +58,7 @@ struct PostCell: View {
 
     var body: some View {
         Group {
-            if let link = post.link, let url = URL(string: link) {
+            if let url = post.url {
                 Link(destination: url) {
                     cell
                 }
