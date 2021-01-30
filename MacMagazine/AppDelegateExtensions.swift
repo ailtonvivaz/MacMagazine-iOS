@@ -10,6 +10,7 @@ import CoreSpotlight
 import Kingfisher
 import StoreKit
 import UIKit
+import WidgetKit
 
 // MARK: - Notification Definitions -
 
@@ -66,6 +67,11 @@ extension AppDelegate {
 
 		// Push Notification
 		PushNotification().setup(options: launchOptions)
+
+        // Uodate widgets
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
 	}
 }
 
